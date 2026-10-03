@@ -1,0 +1,11 @@
+.git
+.env
+*.env
+state
+data
+backups
+exports
+evaluation-results
+__pycache__
+.venv
+supermemory-server

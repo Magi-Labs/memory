@@ -1,0 +1,17 @@
+.env
+*.env
+!.env.example
+state/
+data/
+backups/
+exports/
+evaluation-results/
+*.db
+*.db-*
+*.sqlite*
+__pycache__/
+.venv/
+.DS_Store
+supermemory-server
+*.pem
+*.key
