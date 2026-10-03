@@ -17,3 +17,5 @@ Next work is recorded in the roadmap and in the personal service's `magi-labs/me
 ### Handoff correction
 
 Saving the first real project handoff exposed an INSERT with the wrong number of SQL placeholders. The save rolled back without creating a partial revision. The INSERT now names its seven columns explicitly with seven bindings. The upgrade helper also handles successive release directories without duplicating the state mount.
+
+Corrected gateway revision: `6504010`. Its build and application startup completed. The actual project handoff was then saved as version 1 under `magi-labs/memory`. This was a real state save through the server-side store, not end-to-end MCP/browser flow verification.
