@@ -137,7 +137,7 @@ class Store:
                 raise Conflict(f"Handoff changed: expected version {expected_version}, current version {current}. Read it and reconcile before saving.")
             version = current + 1
             timestamp = now()
-            db.execute("INSERT INTO handoffs VALUES (?,?,?,?,?,?,?,?)",
+            db.execute("INSERT INTO handoffs (project,version,request_id,payload,payload_hash,author,created_at) VALUES (?,?,?,?,?,?,?)",
                 (project, version, request_id, encoded, digest, author, timestamp))
             return {"project": project, "version": version, "context": payload,
                     "author": author, "created_at": timestamp}

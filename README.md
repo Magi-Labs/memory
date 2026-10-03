@@ -78,6 +78,8 @@ We will compare a SQLite full-text baseline, Supermemory local, Mem0 OSS, Hindsi
 
 See [roadmap](docs/ROADMAP.md) and [operations](docs/OPERATIONS.md). The most important next additions are an owner-controlled source journal, budgeted context assembly, client hooks, and secure OAuth for web clients.
 
+The first gateway build has been deployed alongside the existing engine. See [release notes](docs/RELEASES.md) for the exact build/startup evidence and verification boundary.
+
 ## Data and limits
 
 Secrets, private exports, engine binaries, databases, and backups are excluded from Git. Self hosting does not imply zero data egress: an external extraction or embedding provider receives the content needed for its requests. Choose local providers if that is required.

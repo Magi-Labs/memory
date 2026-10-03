@@ -5,6 +5,7 @@ Does not print credentials, restart services, or modify the engine service/data.
 """
 import argparse
 import os
+import re
 import shutil
 from pathlib import Path
 from urllib.parse import urlparse
@@ -31,16 +32,18 @@ before, separator, gateway_and_networks = original_compose.partition("  gateway:
 if not separator:
     raise SystemExit("Expected gateway service was not found")
 gateway, network_separator, networks = gateway_and_networks.partition("\nnetworks:\n")
-expected_build = "      context: .\n      dockerfile: Dockerfile.gateway"
+build_pattern = re.compile(r"      context: (?:\.|\./releases/[A-Za-z0-9._-]+)\n      dockerfile: (?:Dockerfile\.gateway|Dockerfile)")
 expected_env = "    env_file: gateway.env\n"
-if expected_build not in gateway or expected_env not in gateway or not network_separator:
+if len(build_pattern.findall(gateway)) != 1 or expected_env not in gateway or not network_separator:
     raise SystemExit("Deployment layout differs; inspect it before upgrading")
-gateway = gateway.replace(expected_build,
-    "      context: ./releases/" + args.release + "\n      dockerfile: Dockerfile", 1)
-gateway = gateway.replace(expected_env, expected_env +
-    "    volumes:\n      - ./gateway-data:/app/state\n"
-    "    read_only: true\n    tmpfs:\n      - /tmp:size=16m,mode=1777\n"
-    "    cap_drop: [ALL]\n    security_opt: [no-new-privileges:true]\n    mem_limit: 512m\n", 1)
+gateway = build_pattern.sub(lambda _: "      context: ./releases/" + args.release + "\n      dockerfile: Dockerfile", gateway, count=1)
+if "      - ./gateway-data:/app/state\n" not in gateway:
+    if "    volumes:\n" in gateway:
+        raise SystemExit("Gateway has a different volume layout; inspect before upgrading")
+    gateway = gateway.replace(expected_env, expected_env +
+        "    volumes:\n      - ./gateway-data:/app/state\n"
+        "    read_only: true\n    tmpfs:\n      - /tmp:size=16m,mode=1777\n"
+        "    cap_drop: [ALL]\n    security_opt: [no-new-privileges:true]\n    mem_limit: 512m\n", 1)
 updated_compose = before + separator + gateway + network_separator + networks
 original_env = env_path.read_text()
 lines = original_env.splitlines()
