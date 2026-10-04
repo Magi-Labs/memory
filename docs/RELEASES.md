@@ -1,5 +1,19 @@
 # Release notes
 
+## Dashboard redesign — 4 October 2026
+
+Source revision: `23410d9`.
+
+The selected loop-logo direction and document-list/reading-pane layout are implemented in a React/TypeScript frontend with editable shadcn/ui controls. Shared theme tokens cover light and dark mode; the initial mode follows the device, and explicit choices persist across reloads and synchronize across tabs. The code is separated into layout, shared primitives, feature components, typed API contracts, and focused style files. Inter and the logo are served locally.
+
+The new multi-stage Docker image compiles the frontend using Node 24, then serves its static output through the existing Python gateway. TypeScript and Vite completed locally and on Hostinger. The gateway image built successfully and was recreated from release `20261004-23410d9`. Uvicorn reported application startup complete. The engine remained running with its existing container and two-day uptime at rollout.
+
+The upgrade helper retained the engine configuration, memory data, owner login hashes, credential hashes, and persistent control-state mount. It saved the restricted configuration backup at `backups/memory-project-20261004-23410d9`. This release changes dashboard serving paths without relaxing the existing Content Security Policy or API authorization/origin checks.
+
+LiveMCP in Personal Arc rendered the deployed Connections page at `https://memory.deepaksilaych.me/#connections`, including the self-hosted assets, dark theme, and endpoint returned by the owner API. No credentials were created or revoked, and no memories or handoffs were submitted during the UI review.
+
+The selected visual reference and illustrative local browser comparisons are recorded in [design QA](../design-qa.md). No automated tests, end-to-end MCP/client flows, or credential/handoff mutation flows were run. Build, startup, and browser rendering observations do not establish complete functional verification.
+
 ## Initial prototype — 3 October 2026
 
 Source revision: `133479a`.
