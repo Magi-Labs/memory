@@ -1,5 +1,13 @@
 # Release notes
 
+## Empty graph correction — 4 October 2026
+
+Deployed source revision: `a0154cc` (release `20261004-a0154cc`).
+
+The deployed graph collector expected source documents under `documents`, but the engine returned `memories`. Live diagnosis showed 45 listed documents and zero collected graph nodes. The adapter now accepts either response field. The canvas also shows explicit loading, error/retry, empty-library, and no-matching-filter states.
+
+TypeScript/Vite and the Docker image built successfully. Only the gateway was recreated, with a configuration backup at `backups/memory-project-20261004-a0154cc`. After reloading the graph in Personal Arc through LiveMCP, the dashboard reported 525 nodes and 521 connections. These are source membership and version-lineage relationships; this fix does not introduce inferred semantic edges. No automated tests were added or run.
+
 ## Dashboard redesign — 4 October 2026
 
 Source revision: `23410d9`.
