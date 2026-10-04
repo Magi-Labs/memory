@@ -1,5 +1,7 @@
 # Memory
 
+[Product website](https://magi-labs.github.io/memory/)
+
 [Memory Plugin](https://github.com/Magi-Labs/memory-plugin) : install the shared memory skill and MCP setup for Codex, Claude Code, Hermes, and other compatible agents.
 
 ----
