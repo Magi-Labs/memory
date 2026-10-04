@@ -4,7 +4,7 @@ Decision date: 3 October 2026. Scope: one human with multiple devices, clients, 
 
 ## Owned-engine direction — 4 October 2026
 
-The replacement design is recorded in [ADR 0002](decisions/0002-owned-memory-engine.md): PostgreSQL source journal, durable jobs, full-text search, optional pgvector/LLM processing, and evidence-backed facts/relationships. It is a proposed implementation; Supermemory remains the active backend. The UI now uses shadcn primitives and React Flow/Dagre.
+The replacement design is recorded in [ADR 0002](decisions/0002-owned-memory-engine.md): PostgreSQL source journal, durable jobs, full-text search, optional pgvector/LLM processing, and evidence-backed facts/relationships. It is a proposed implementation; Supermemory remains the active backend. The UI now uses shadcn primitives and React Flow + D3.
 
 ## Product boundary
 

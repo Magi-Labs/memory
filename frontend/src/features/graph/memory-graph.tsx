@@ -1,7 +1,14 @@
 import { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Background, Controls, MiniMap, ReactFlow, Position, type Node } from '@xyflow/react'
-import dagre from '@dagrejs/dagre'
+import {
+  forceSimulation,
+  forceLink,
+  forceManyBody,
+  forceCollide,
+  forceCenter,
+  type SimulationNodeDatum,
+} from 'd3-force'
 import { api } from '@/lib/api'
 import { date } from '@/lib/format'
 import type { GraphResult } from '@/lib/types'
@@ -18,7 +25,7 @@ import { Metadata } from '@/components/shared/metadata'
 import { DocumentModal } from '@/features/memories/document-modal'
 import { useTheme } from '@/hooks/use-theme'
 
-// Filtering is domain logic. Dagre owns layout; React Flow owns rendering and interaction.
+// Filtering is domain logic. D3 owns layout; React Flow owns rendering and interaction.
 function flowGraph(graph: GraphResult | undefined, query: string, latest: boolean) {
   let nodes = (graph?.nodes || []).filter(
     (n) =>
@@ -42,17 +49,29 @@ function flowGraph(graph: GraphResult | undefined, query: string, latest: boolea
   }
   const ids = new Set(nodes.map((n) => n.id))
   const edges = (graph?.edges || []).filter((e) => ids.has(e.source) && ids.has(e.target))
-  const layout = new dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}))
-  layout.setGraph({ rankdir: 'LR', nodesep: 25, ranksep: 100 })
-  nodes.forEach((n) => layout.setNode(n.id, { width: 180, height: 80 }))
-  edges.forEach((e) => layout.setEdge(e.source, e.target))
-  dagre.layout(layout)
+  const points: (SimulationNodeDatum & { id: string })[] = nodes.map((n) => ({ id: n.id }))
+  forceSimulation(points)
+    .force(
+      'links',
+      forceLink<SimulationNodeDatum & { id: string }, { source: string; target: string }>(
+        edges.map((e) => ({ source: e.source, target: e.target })),
+      )
+        .id((n) => n.id)
+        .distance(230)
+        .strength(0.25),
+    )
+    .force('charge', forceManyBody().strength(-600))
+    .force('collision', forceCollide(110).iterations(2))
+    .force('center', forceCenter(0, 0))
+    .stop()
+    .tick(240)
+  const positions = new Map(points.map((p) => [p.id, p]))
   return {
     nodes: nodes.map((n) => {
-      const p = layout.node(n.id)
+      const p = positions.get(n.id)!
       return {
         id: n.id,
-        position: { x: p.x - 90, y: p.y - 40 },
+        position: { x: (p.x ?? 0) - 90, y: (p.y ?? 0) - 40 },
         data: { label: n.label.length > 70 ? n.label.slice(0, 67) + '…' : n.label },
         ariaLabel: n.label,
         sourcePosition: Position.Right,

@@ -1,6 +1,6 @@
 # Personal dashboard
 
-React, TypeScript, Vite, Tailwind CSS, and editable shadcn/ui primitives. React Flow renders the graph and Dagre lays it out. API state uses TanStack Query; Phosphor supplies the outline icons. Inter is bundled and served locally. The generated loop mark is a local PNG asset.
+React, TypeScript, Vite, Tailwind CSS, and editable shadcn/ui primitives. React Flow renders the graph and D3 force lays it out. API state uses TanStack Query; Phosphor supplies the outline icons. Inter is bundled and served locally. The generated loop mark is a local PNG asset.
 
 ## Build
 
@@ -26,7 +26,7 @@ For UI development, run `npm run dev`. Vite proxies `/api` to a local gateway on
 | `src/components/layout` | Sidebar and breadcrumb/theme controls |
 | `src/components/shared` | Compositions of library components; React error boundary |
 | `src/features/memories` | Search, pagination, source reading pane, extracted facts |
-| `src/features/graph` | React Flow graph, Dagre layout and domain filtering |
+| `src/features/graph` | React Flow graph, D3 force layout and domain filtering |
 | `src/features/handoffs` | Structured task state and revision editor |
 | `src/features/connections` | Client setup and credential management |
 | `src/lib` | Typed API, data contracts and formatting |
@@ -44,4 +44,4 @@ The initialization script, bundle, font, and logo use same-origin assets. Dialog
 
 ## UI source and notices
 
-The selected design and browser comparison evidence live in `../docs/design`; `../design-qa.md` records the visual review and its limits. Those screenshots contain illustrative local documents, not production exports. shadcn components come from its official CLI/registry and use local utility imports, Phosphor icons and theme tokens. React Flow and Dagre are pinned dependencies. Upstream notices are retained in `licenses` and copied into the runtime image.
+The selected design and browser comparison evidence live in `../docs/design`; `../design-qa.md` records the visual review and its limits. Those screenshots contain illustrative local documents, not production exports. shadcn components come from its official CLI/registry and use local utility imports, Phosphor icons and theme tokens. React Flow and D3 force are pinned dependencies. Upstream notices are retained in `licenses` and copied into the runtime image.
