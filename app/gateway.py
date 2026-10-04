@@ -23,6 +23,7 @@ from storage import Conflict, Store
 ORIGIN = os.environ.get("PUBLIC_ORIGIN", "https://memory.example.com").rstrip("/")
 TAG = os.environ.get("MEMORY_CONTAINER_TAG", "personal")
 ROOT = Path(__file__).parent
+FRONTEND_ROOT = Path(os.environ.get("FRONTEND_DIR", ROOT.parent / "frontend" / "dist"))
 store = Store(os.environ.get("STATE_DIR", "/app/state"))
 backend = SupermemoryBackend(os.environ.get("SUPERMEMORY_URL", "http://engine:6767"),
                             os.environ["SUPERMEMORY_API_KEY"], TAG)
@@ -233,7 +234,10 @@ async def input_error(request, exc):
 
 @app.get("/")
 async def dashboard():
-    return HTMLResponse((ROOT / "dashboard.html").read_text(), headers={
+    index = FRONTEND_ROOT / "index.html"
+    if not index.is_file():
+        raise HTTPException(503, "Dashboard build is unavailable")
+    return HTMLResponse(index.read_text(), headers={
         "Content-Security-Policy": "default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self' data:; frame-ancestors 'none'; object-src 'none'; base-uri 'none'; form-action 'self'"})
 
 
@@ -311,5 +315,5 @@ async def persist_handoff(body: HandoffInput):
     return await write_handoff(body)
 
 
-app.mount("/assets", StaticFiles(directory=ROOT / "assets"), name="assets")
+app.mount("/assets", StaticFiles(directory=FRONTEND_ROOT / "assets", check_dir=False), name="assets")
 app.mount("/mcp", mcp.streamable_http_app())

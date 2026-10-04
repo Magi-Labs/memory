@@ -9,6 +9,7 @@ Keep durable facts searchable and carry the current task between clients without
 ## First implementation
 
 - A personal dashboard with documents, search, source details, and an interactive graph.
+- A React/TypeScript frontend with shadcn/ui controls, a document reading pane, and persistent light/dark mode.
 - Graph edges backed by document membership and `parentMemoryId` lineage. Missing reference content and incomplete coverage are visible.
 - A persistent credential registry with per-client names, read-only/read-write access, last authenticated use, and revocation. New bearer tokens are shown once and stored only as hashes.
 - Versioned task handoffs: goal, current state, decisions, next steps, and references. Concurrent edits fail with a version conflict; retrying a saved request ID returns the existing revision.
@@ -44,6 +45,10 @@ Prerequisites: Docker Compose, a private/reachable Supermemory instance, and an 
 6. In **Connections**, create one credential per client/device and use the corresponding setup example.
 
 The Compose service is the control plane only; it does not install or reset the engine. Install/configure the engine using the [upstream self-hosting guide](https://supermemory.ai/docs/self-hosting/quickstart). Keep engine state and control-plane state in separate persistent volumes.
+
+## Frontend development
+
+Frontend development and the component structure are documented in [frontend/README.md](frontend/README.md). Docker compiles the UI during its build; a local Python checkout requires `npm ci && npm run build` from `frontend` first.
 
 ## Agent workflow
 

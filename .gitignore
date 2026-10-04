@@ -15,3 +15,6 @@ __pycache__/
 supermemory-server
 *.pem
 *.key
+node_modules/
+frontend/dist/
+*.tsbuildinfo

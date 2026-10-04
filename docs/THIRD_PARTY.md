@@ -11,3 +11,9 @@ Sources studied:
 - [Letta](https://github.com/letta-ai/letta) — architecture reference only; check current licenses and dependency terms before copying code or embedding components.
 
 FastAPI, the MCP Python SDK, httpx, and uvicorn are installed as dependencies; their own licenses apply. Preserve upstream notices if source is incorporated later. Managed service capabilities and terms are distinct from an OSS repository license.
+
+## Frontend
+
+The dashboard uses React, TanStack Query, Tailwind CSS, Radix UI, and other packages pinned in `frontend/package-lock.json`. shadcn/ui button, input, and textarea source was generated with its CLI and adapted locally. Its MIT notice and the Phosphor Icons MIT notice are retained in `frontend/licenses`. The self-hosted Inter font's SIL Open Font License is retained there as well. Runtime images include these notices in `/app/ui/licenses`.
+
+The loop logo was generated from the user's selected design direction; it is stored as a PNG. Standard outline icons come from the Phosphor React package. No memory engine source, private source documents, or API credentials are part of the frontend.

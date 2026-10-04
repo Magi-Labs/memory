@@ -1,0 +1,252 @@
+@media (min-width: 1600px) {
+  main {
+    padding: 0 48px;
+  }
+  .memory-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 1100px) {
+  .shell {
+    grid-template-columns: 220px minmax(0, 1fr);
+  }
+  .sidebar {
+    padding: 28px 12px 22px;
+  }
+  .brand {
+    font-size: 27px;
+    gap: 8px;
+    padding: 0 6px;
+  }
+  .brand-mark {
+    width: 44px;
+    height: 36px;
+  }
+  .brand small {
+    font-size: 11px;
+  }
+  .nav[data-slot='button'] {
+    font-size: 14px;
+    gap: 12px;
+    min-height: 46px;
+    padding: 11px 14px;
+  }
+  .nav .icon {
+    width: 22px;
+    height: 22px;
+  }
+  main {
+    padding: 0 26px;
+  }
+  .memory-library {
+    padding-right: 14px;
+  }
+  .memory-detail {
+    padding-left: 22px;
+  }
+  .memory-detail > h2 {
+    font-size: 22px;
+  }
+  .graph-workspace {
+    grid-template-columns: 1fr;
+  }
+  .graph-detail {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+    max-height: 230px;
+  }
+  .connection-layout {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 960px) {
+  .memory-workspace {
+    grid-template-columns: 1fr;
+  }
+  .memory-library {
+    padding-right: 0;
+  }
+  .memory-list {
+    min-height: 0;
+    max-height: 400px;
+  }
+  .memory-detail {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+    padding: 24px 0;
+    max-height: none;
+    min-height: 0;
+    margin-top: 24px;
+  }
+  .memory-workspace:not(.has-detail) .memory-detail {
+    display: none;
+  }
+  .memory-detail > h2 {
+    font-size: 25px;
+  }
+}
+@media (max-width: 760px) {
+  .shell {
+    display: block;
+  }
+  .sidebar {
+    height: auto;
+    min-height: 0;
+    position: static;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    padding: 18px 16px 12px;
+  }
+  .brand {
+    font-size: 25px;
+    padding: 0;
+  }
+  .brand-mark {
+    width: 40px;
+    height: 32px;
+  }
+  .brand small {
+    font-size: 10px;
+    margin-top: 3px;
+  }
+  .sidebar-label,
+  .sidebar-bottom {
+    display: none;
+  }
+  .sidebar nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px;
+    padding: 4px 0;
+    margin-top: 18px;
+    scrollbar-width: thin;
+  }
+  .nav[data-slot='button'] {
+    padding: 9px 11px;
+    font-size: 13px;
+    gap: 7px;
+    width: 100%;
+    flex: 0 0 auto;
+    min-height: 40px;
+  }
+  .nav.active::before {
+    left: 8px;
+    right: 8px;
+    bottom: 0;
+    top: auto;
+    width: auto;
+    height: 2px;
+  }
+  .nav .icon {
+    width: 18px;
+    height: 18px;
+  }
+  main {
+    padding: 0 20px;
+  }
+  .topbar {
+    height: 52px;
+    margin-bottom: 10px;
+    font-size: 11px;
+  }
+  h1 {
+    font-size: 29px;
+  }
+  .heading {
+    gap: 12px;
+    margin-bottom: 22px;
+    align-items: flex-start;
+  }
+  .heading > div > .muted {
+    font-size: 13px;
+  }
+  .heading > button {
+    font-size: 11px;
+    padding: 8px 10px;
+  }
+  .heading > button .icon {
+    width: 16px;
+    height: 16px;
+  }
+  .searchbar {
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 25px;
+  }
+  .search-input {
+    flex-basis: 100%;
+  }
+  .search-input input {
+    font-size: 13px;
+  }
+  .searchbar > button {
+    font-size: 12px;
+    padding: 9px 16px;
+  }
+  .memory-list {
+    max-height: 390px;
+  }
+  .memory-workspace {
+    min-height: 0;
+  }
+  .memory-row[data-slot='button'] {
+    padding: 16px 10px;
+    min-height: 100px;
+  }
+  .memory-row.selected {
+    padding-left: 7px;
+  }
+  .memory-row h3 {
+    font-size: 14px;
+  }
+  .memory-grid {
+    grid-template-columns: 1fr;
+  }
+  .memory-detail > h2 {
+    font-size: 24px;
+  }
+  .memory-detail .document-body {
+    font-size: 16px;
+  }
+  .credential-form {
+    flex-wrap: wrap;
+  }
+  .credential-form .field:first-child {
+    flex-basis: 100%;
+  }
+  .graph-toolbar {
+    gap: 6px;
+  }
+  .graph-toolbar label {
+    margin: 0;
+    font-size: 11px;
+  }
+  #graph-svg {
+    height: 430px;
+  }
+  .panel {
+    padding: 19px;
+  }
+  .copy-row {
+    flex-wrap: wrap;
+  }
+  .copy-row code {
+    flex-basis: 80%;
+  }
+  .legend {
+    gap: 12px;
+    font-size: 9px;
+  }
+  footer {
+    line-height: 1.5;
+    margin-top: 25px;
+  }
+  dialog {
+    padding: 22px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  button {
+    transition: none;
+  }
+}

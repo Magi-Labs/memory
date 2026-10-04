@@ -9,3 +9,7 @@ evaluation-results
 __pycache__
 .venv
 supermemory-server
+**/node_modules
+frontend/dist
+docs/design
+*.tsbuildinfo
