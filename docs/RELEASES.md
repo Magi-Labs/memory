@@ -1,5 +1,13 @@
 # Release notes
 
+## Dashboard shell and graph recovery — 4 October 2026
+
+Deployed source revision: `a0634a6`, release `20261004-a0634a6-r2`. The shell now adapts the official shadcn dashboard-01 composition with SidebarProvider/SidebarInset, collapsible navigation, a mobile Sheet, and the existing logo and theme. The old sidebar styling was removed. Upstream notices remain in the image.
+
+Graph panning now snapshots the drag origin before queuing a React state update; pointer release could previously clear the mutable ref before that update read it. Lost pointer capture also clears dragging. Per-view and root error boundaries provide recovery UI, and unreadable API JSON becomes an explicit request error. The reported original blank-screen exception was not captured or reproduced, so the drag race is a code-level finding rather than a confirmed diagnosis of that screenshot.
+
+Local TypeScript/Vite and production Docker builds completed. An interrupted initial source upload was stopped before activating a release; the compressed runtime-only retry succeeded. The upgrade backed up configuration under `backups/memory-project-20261004-a0634a6-r2` and recreated only the gateway. LiveMCP in Personal Arc displayed the new shell and graph with 525 nodes and 521 connections. No automated tests or complete interaction/mobile verification were performed.
+
 ## Empty graph correction — 4 October 2026
 
 Deployed source revision: `a0154cc` (release `20261004-a0154cc`).
