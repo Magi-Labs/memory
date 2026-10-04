@@ -1,15 +1,11 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import './tokens.css';
-@import './base.css';
-@import './layout.css';
-@import './memories.css';
-@import './graph.css';
-@import './integrations.css';
-@import './responsive.css';
-@import './themes.css';
 @custom-variant dark (&:is(.dark *));
 @theme inline {
+  --font-sans: 'Inter Variable', sans-serif;
+  --color-card: var(--surface);
+  --color-card-foreground: var(--ink);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--ink);
   --color-sidebar-primary: var(--accent);
@@ -34,4 +30,16 @@
   --color-input: var(--line);
   --color-ring: var(--accent);
   --color-destructive: var(--danger);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply m-0 bg-background font-sans text-foreground antialiased;
+  }
+  [hidden] {
+    display: none !important;
+  }
 }

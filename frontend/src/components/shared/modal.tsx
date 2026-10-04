@@ -1,7 +1,5 @@
-import { useEffect, useRef, type ReactNode } from 'react'
-import { Button } from '@/components/ui/button'
-import { Icon } from './icon'
-// Native dialog supplies focus trapping, Escape and inert background without CSP inline-style exemptions.
+import type { ReactNode } from 'react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 export function Modal({
   open,
   onClose,
@@ -15,31 +13,23 @@ export function Modal({
   children: ReactNode
   id: string
 }) {
-  const ref = useRef<HTMLDialogElement>(null)
-  const closeHandler = useRef(onClose)
-  closeHandler.current = onClose
-  useEffect(() => {
-    const dialog = ref.current
-    if (open && !dialog?.open) dialog?.showModal()
-    if (!open && dialog?.open) dialog.close()
-  }, [open])
   return (
-    <dialog
-      ref={ref}
-      id={id}
-      aria-labelledby={`${id}-title`}
-      onCancel={(event) => {
-        event.preventDefault()
-        closeHandler.current()
+    <Dialog
+      open={open}
+      onOpenChange={(value) => {
+        if (!value) onClose()
       }}
     >
-      <div className="dialog-heading">
-        <h2 id={`${id}-title`}>{title}</h2>
-        <Button variant="ghost" size="icon" aria-label={`Close ${title}`} onClick={onClose}>
-          <Icon name="close" />
-        </Button>
-      </div>
-      {open && children}
-    </dialog>
+      <DialogContent
+        id={id}
+        aria-describedby={undefined}
+        className="max-h-[90dvh] overflow-y-auto sm:max-w-2xl"
+      >
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+        </DialogHeader>
+        {children}
+      </DialogContent>
+    </Dialog>
   )
 }

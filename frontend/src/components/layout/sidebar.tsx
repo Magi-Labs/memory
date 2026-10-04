@@ -1,3 +1,5 @@
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
+import { Item, ItemContent, ItemTitle, ItemDescription } from '@/components/ui/item'
 // Adapted from shadcn/ui dashboard-01. See frontend/licenses/shadcn-ui-MIT.txt.
 import type { View } from '@/lib/types'
 import { Icon } from '@/components/shared/icon'
@@ -34,17 +36,21 @@ export function Sidebar({ view, onNavigate }: { view: View; onNavigate: (view: V
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild size="lg" className="memory-brand" tooltip="Memory home">
+            <SidebarMenuButton asChild size="lg" className="gap-3" tooltip="Memory home">
               <a href="#memories" onClick={() => navigate('memories')} aria-label="Memory home">
-                <img
-                  className="brand-mark"
-                  src="/assets/memory-mark.png"
-                  width={32}
-                  height={32}
-                  alt=""
-                />
-                <span className="brand-copy">
-                  memory<small>by Magi Labs</small>
+                <Avatar className="rounded-none">
+                  <AvatarImage
+                    src="/assets/memory-mark.png"
+                    alt=""
+                    className="object-contain dark:brightness-200"
+                  />
+                  <AvatarFallback>M</AvatarFallback>
+                </Avatar>
+                <span className="text-xl font-semibold tracking-tight group-data-[collapsible=icon]:hidden">
+                  memory
+                  <span className="block text-xs font-normal tracking-normal text-muted-foreground">
+                    by Magi Labs
+                  </span>
                 </span>
               </a>
             </SidebarMenuButton>
@@ -92,14 +98,17 @@ export function Sidebar({ view, onNavigate }: { view: View; onNavigate: (view: V
       </SidebarContent>
       <SidebarSeparator />
       <SidebarFooter>
-        <div className="workspace-account">
-          <div className="workspace-avatar">
-            <Icon name="user" />
-          </div>
-          <div className="workspace-copy">
-            Personal workspace<small>Self hosted · One owner</small>
-          </div>
-        </div>
+        <Item size="sm" className="p-0 flex-nowrap">
+          <Avatar className="rounded-lg">
+            <AvatarFallback>
+              <Icon name="user" />
+            </AvatarFallback>
+          </Avatar>
+          <ItemContent className="group-data-[collapsible=icon]:hidden">
+            <ItemTitle>Personal workspace</ItemTitle>
+            <ItemDescription className="text-xs">Self hosted · One owner</ItemDescription>
+          </ItemContent>
+        </Item>
       </SidebarFooter>
     </SidebarPanel>
   )

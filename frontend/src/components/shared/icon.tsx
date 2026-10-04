@@ -27,5 +27,7 @@ const icons = {
 }
 export function Icon({ name, className }: { name: keyof typeof icons; className?: string }) {
   const Component = icons[name]
-  return <Component weight="regular" className={cn('icon', className)} aria-hidden="true" />
+  return (
+    <Component weight="regular" className={cn('size-4 shrink-0', className)} aria-hidden="true" />
+  )
 }

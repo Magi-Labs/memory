@@ -12,6 +12,10 @@
 
 “Implemented” means code exists. It does not imply benchmark results or verified connectivity from every client.
 
+## Owned engine implementation plan
+
+Follow [ADR 0002](decisions/0002-owned-memory-engine.md) in order: source journal/full-text/import, durable workers/embeddings, facts/corrections/graph, context assembly/grants, then a verified migration and cutover. Supermemory remains active until those gates pass.
+
 ## Next: portability and trustworthy context
 
 - [ ] Canonical source journal with event IDs, timestamps, provenance, authority, and content hashes.

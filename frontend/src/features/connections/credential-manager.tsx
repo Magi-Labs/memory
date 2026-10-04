@@ -1,3 +1,26 @@
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table'
+import { Badge } from '@/components/ui/badge'
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from '@/components/ui/alert-dialog'
+import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select'
+import { Card, CardContent, CardTitle } from '@/components/ui/card'
+import { Label } from '@/components/ui/label'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useState, type FormEvent } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '@/lib/api'
@@ -15,6 +38,7 @@ export function CredentialManager({ notify }: { notify: Notify }) {
   const [name, setName] = useState('')
   const [access, setAccess] = useState('read_write')
   const [creating, setCreating] = useState(false)
+  const [revokeTarget, setRevokeTarget] = useState<Credential | null>(null)
   const [revoking, setRevoking] = useState<string | null>(null)
   const [token, setToken] = useState<string | null>(null)
   async function create(event: FormEvent) {
@@ -33,15 +57,10 @@ export function CredentialManager({ notify }: { notify: Notify }) {
     }
   }
   async function revoke(credential: Credential) {
-    if (
-      !window.confirm(
-        `Revoke “${credential.name}”? Clients using this credential will lose access immediately.`,
-      )
-    )
-      return
     setRevoking(credential.id)
     try {
       await api.revokeCredential(credential.id)
+      setRevokeTarget(null)
       notify('Credential revoked.')
       void credentials.refetch()
     } catch (error) {
@@ -60,108 +79,144 @@ export function CredentialManager({ notify }: { notify: Notify }) {
     }
   }
   return (
-    <section className="panel credentials-panel">
-      <div className="heading compact">
-        <div>
-          <h2>Agent & device credentials</h2>
-          <p className="muted small">
-            Last used records an authenticated request, not successful task completion.
+    <Card>
+      <CardContent className="space-y-6">
+        <div className="space-y-2">
+          <div>
+            <CardTitle>Agent & device credentials</CardTitle>
+            <p className="text-xs text-muted-foreground">
+              Last used records an authenticated request, not successful task completion.
+            </p>
+          </div>
+        </div>
+        <form className="flex flex-wrap items-end gap-4" onSubmit={(event) => void create(event)}>
+          <Label className="flex flex-col items-start gap-2">
+            Name
+            <Input
+              required
+              maxLength={100}
+              placeholder="Claude · laptop"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+            />
+          </Label>
+          <Label className="flex flex-col items-start gap-2">
+            Access
+            <NativeSelect value={access} onChange={(event) => setAccess(event.target.value)}>
+              <NativeSelectOption value="read_write">Read & write</NativeSelectOption>
+              <NativeSelectOption value="read_only">Read only</NativeSelectOption>
+            </NativeSelect>
+          </Label>
+          <Button type="submit" disabled={creating}>
+            {creating ? 'Creating…' : 'Create credential'}
+          </Button>
+        </form>
+        {credentials.error && (
+          <Alert variant="destructive">
+            <AlertDescription>{credentials.error.message}</AlertDescription>
+          </Alert>
+        )}
+        <div className="overflow-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Client / device</TableHead>
+                <TableHead>Access</TableHead>
+                <TableHead>Last used</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>
+                  <span className="sr-only">Action</span>
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {credentials.data?.credentials.map((credential) => (
+                <TableRow key={credential.id}>
+                  <TableCell>
+                    {credential.name}
+                    <p className="text-xs text-muted-foreground">{credential.prefix}</p>
+                  </TableCell>
+                  <TableCell>
+                    {credential.scopes.includes('write') ? 'Read & write' : 'Read only'}
+                  </TableCell>
+                  <TableCell>{date(credential.last_used_at)}</TableCell>
+                  <TableCell className={credential.revoked_at ? 'revoked' : ''}>
+                    <Badge variant={credential.revoked_at ? 'outline' : 'secondary'}>
+                      {credential.revoked_at ? 'Revoked' : 'Active'}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    {!credential.revoked_at && (
+                      <Button
+                        variant="outline"
+
+                        disabled={revoking === credential.id}
+                        onClick={() => setRevokeTarget(credential)}
+                      >
+                        Revoke
+                      </Button>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+        {credentials.isPending && (
+          <p className="text-sm text-muted-foreground" role="status">
+            Loading credentials…
           </p>
-        </div>
-      </div>
-      <form className="credential-form" onSubmit={(event) => void create(event)}>
-        <label className="field">
-          Name
-          <Input
-            required
-            maxLength={100}
-            placeholder="Claude · laptop"
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-          />
-        </label>
-        <label className="field">
-          Access
-          <select value={access} onChange={(event) => setAccess(event.target.value)}>
-            <option value="read_write">Read & write</option>
-            <option value="read_only">Read only</option>
-          </select>
-        </label>
-        <Button type="submit" disabled={creating}>
-          {creating ? 'Creating…' : 'Create credential'}
-        </Button>
-      </form>
-      {credentials.error && (
-        <p className="error" role="alert">
-          {credentials.error.message}
-        </p>
-      )}
-      <div className="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Client / device</th>
-              <th>Access</th>
-              <th>Last used</th>
-              <th>Status</th>
-              <th>
-                <span className="sr-only">Action</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {credentials.data?.credentials.map((credential) => (
-              <tr key={credential.id}>
-                <td>
-                  {credential.name}
-                  <small>{credential.prefix}</small>
-                </td>
-                <td>{credential.scopes.includes('write') ? 'Read & write' : 'Read only'}</td>
-                <td>{date(credential.last_used_at)}</td>
-                <td className={credential.revoked_at ? 'revoked' : ''}>
-                  {credential.revoked_at ? 'Revoked' : 'Active'}
-                </td>
-                <td>
-                  {!credential.revoked_at && (
-                    <Button
-                      variant="outline"
-                      className="danger"
-                      disabled={revoking === credential.id}
-                      onClick={() => void revoke(credential)}
-                    >
-                      Revoke
-                    </Button>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      {credentials.isPending && (
-        <p className="muted" role="status">
-          Loading credentials…
-        </p>
-      )}
-      {credentials.data && !credentials.data.credentials.length && (
-        <p className="muted">No credentials yet. Give each agent or device its own credential.</p>
-      )}
-      <Modal
-        id="token-dialog"
-        open={token !== null}
-        title="Your new credential"
-        onClose={() => setToken(null)}
-      >
-        <p>Copy it now. It is shown once; only its hash is stored.</p>
-        <div className="copy-row token-row">
-          <code>{token}</code>
-          <Button onClick={() => void copy()}>Copy</Button>
-        </div>
-        <p className="muted">
-          Closing this window clears the token from the page. If you lose it, revoke it and create
-          another.
-        </p>
-      </Modal>
-    </section>
+        )}
+        {credentials.data && !credentials.data.credentials.length && (
+          <p className="text-sm text-muted-foreground">
+            No credentials yet. Give each agent or device its own credential.
+          </p>
+        )}
+        <AlertDialog
+          open={!!revokeTarget}
+          onOpenChange={(open) => {
+            if (!open && !revoking) setRevokeTarget(null)
+          }}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Revoke {revokeTarget?.name}?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Clients using this credential will lose access immediately.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={!!revoking}>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                variant="destructive"
+                disabled={!!revoking}
+                onClick={(event) => {
+                  event.preventDefault()
+                  if (revokeTarget) void revoke(revokeTarget)
+                }}
+              >
+                Revoke
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+        <Modal
+          id="token-dialog"
+          open={token !== null}
+          title="Your new credential"
+          onClose={() => setToken(null)}
+        >
+          <p>Copy it now. It is shown once; only its hash is stored.</p>
+          <div className="flex flex-wrap gap-2 rounded-md bg-muted p-3 text-sm break-all">
+            <code>{token}</code>
+            <Button onClick={() => void copy()}>Copy</Button>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Closing this window clears the token from the page. If you lose it, revoke it and create
+            another.
+          </p>
+        </Modal>
+      </CardContent>
+    </Card>
   )
 }

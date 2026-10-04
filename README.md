@@ -8,12 +8,12 @@ A self-hosted home for one person's context, across devices and AI agents.
 
 Keep durable facts searchable and carry the current task between clients without rebuilding the conversation from scratch. The repository belongs to Magi Labs; an installation serves a **single personal owner**. It has no organization, team, or billing model.
 
-**Status: initial prototype.** Supermemory is the first implemented memory backend. Other engines are research candidates, not implemented integrations or measured winners. Client setup examples are documented; automatic capture, OAuth for web connectors, and offline device sync are pending.
+**Status: initial prototype.** Supermemory is the first implemented memory backend. An owned PostgreSQL/pgvector backend is [designed](docs/decisions/0002-owned-memory-engine.md), not implemented or migrated yet. Client setup examples are documented; automatic capture, OAuth for web connectors, and offline device sync are pending.
 
 ## First implementation
 
 - A personal dashboard with documents, search, source details, and an interactive graph.
-- A React/TypeScript frontend with shadcn/ui controls, a document reading pane, and persistent light/dark mode.
+- A React/TypeScript frontend with shadcn/ui components throughout, React Flow/Dagre for the graph, a document reading pane, and persistent light/dark mode.
 - Graph edges backed by document membership and `parentMemoryId` lineage. Missing reference content and incomplete coverage are visible.
 - A persistent credential registry with per-client names, read-only/read-write access, last authenticated use, and revocation. New bearer tokens are shown once and stored only as hashes.
 - Versioned task handoffs: goal, current state, decisions, next steps, and references. Concurrent edits fail with a version conflict; retrying a saved request ID returns the existing revision.

@@ -1,3 +1,7 @@
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
+import { Empty, EmptyDescription, EmptyHeader } from '@/components/ui/empty'
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '@/lib/api'
@@ -21,7 +25,7 @@ export function HandoffsView({ notify }: { notify: Notify }) {
     }
   }
   return (
-    <>
+    <div className="space-y-6">
       <PageHeading
         eyebrow="PICK UP WHERE YOU LEFT OFF"
         title="Task handoffs"
@@ -32,46 +36,58 @@ export function HandoffsView({ notify }: { notify: Notify }) {
           </Button>
         }
       />
-      <div className="callout">
-        Agents can use <code>get_handoff</code> and <code>save_handoff</code> over MCP. Saving a
-        handoff calls no memory-layer LLM.
-      </div>
+      <Alert>
+        <AlertDescription>
+          Agents can use <code>get_handoff</code> and <code>save_handoff</code> over MCP. Saving a
+          handoff calls no memory-layer LLM.
+        </AlertDescription>
+      </Alert>
       {list.isPending && (
-        <p className="muted" role="status">
+        <p className="text-sm text-muted-foreground" role="status">
           Loading handoffs…
         </p>
       )}
       {list.error && (
-        <p className="error" role="alert">
-          {list.error.message}
-        </p>
+        <Alert variant="destructive">
+          <AlertDescription>{list.error.message}</AlertDescription>
+        </Alert>
       )}
-      <div className="memory-grid">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {list.data?.handoffs.map((item) => (
-          <Button
-            variant="ghost"
-            className="memory-card"
-            key={item.project}
-            onClick={() => void open(item.project)}
-            disabled={loadingProject !== null}
-          >
-            <h3>{item.project}</h3>
-            <p>{item.context.goal}</p>
-            <div className="card-meta">
-              <span className="status">v{item.version}</span>
-              <span>{item.author}</span>
-            </div>
-          </Button>
+          <Card key={item.project}>
+            <CardHeader>
+              <CardTitle>{item.project}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm">{item.context.goal}</p>
+            </CardContent>
+            <CardFooter className="flex flex-wrap justify-between gap-2">
+              <Badge variant="secondary">
+                v{item.version} · {item.author}
+              </Badge>
+              <Button
+                variant="outline"
+                disabled={loadingProject !== null}
+                onClick={() => void open(item.project)}
+              >
+                Open handoff
+              </Button>
+            </CardFooter>
+          </Card>
         ))}
       </div>
       {list.data && !list.data.handoffs.length && (
-        <p className="empty">
-          No saved task handoffs yet. Create one here or ask an agent to save before switching.
-        </p>
+        <Empty>
+          <EmptyHeader>
+            <EmptyDescription>
+              No saved task handoffs yet. Create one here or ask an agent to save before switching.
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       )}
       {editor && (
         <HandoffEditor item={editor.item} onClose={() => setEditor(null)} notify={notify} />
       )}
-    </>
+    </div>
   )
 }

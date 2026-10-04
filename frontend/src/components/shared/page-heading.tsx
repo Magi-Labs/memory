@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react'
+import { Item, ItemContent, ItemTitle, ItemDescription, ItemActions } from '@/components/ui/item'
 export function PageHeading({
   title,
   description,
-  eyebrow,
   action,
 }: {
   title: string
@@ -11,13 +11,14 @@ export function PageHeading({
   action?: ReactNode
 }) {
   return (
-    <div className="heading">
-      <div>
-        {eyebrow && <p className="eyebrow">{eyebrow}</p>}
-        <h1>{title}</h1>
-        <p className="muted">{description}</p>
-      </div>
-      {action}
-    </div>
+    <Item className="px-0">
+      <ItemContent>
+        <ItemTitle role="heading" aria-level={1} className="text-2xl font-semibold tracking-tight">
+          {title}
+        </ItemTitle>
+        <ItemDescription>{description}</ItemDescription>
+      </ItemContent>
+      {action && <ItemActions>{action}</ItemActions>}
+    </Item>
   )
 }

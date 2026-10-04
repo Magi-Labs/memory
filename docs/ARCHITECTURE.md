@@ -2,6 +2,10 @@
 
 Decision date: 3 October 2026. Scope: one human with multiple devices, clients, projects, and conversations.
 
+## Owned-engine direction — 4 October 2026
+
+The replacement design is recorded in [ADR 0002](decisions/0002-owned-memory-engine.md): PostgreSQL source journal, durable jobs, full-text search, optional pgvector/LLM processing, and evidence-backed facts/relationships. It is a proposed implementation; Supermemory remains the active backend. The UI now uses shadcn primitives and React Flow/Dagre.
+
 ## Product boundary
 
 The desired outcome is to switch from one agent to another and continue with the right context. Saving more text is insufficient if the next client cannot identify the current task, outdated facts, or supporting evidence.

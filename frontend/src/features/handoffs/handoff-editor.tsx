@@ -1,3 +1,5 @@
+import { Label } from '@/components/ui/label'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useState, type FormEvent } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/api'
@@ -50,8 +52,8 @@ export function HandoffEditor({
   }
   return (
     <Modal id="handoff-dialog" open onClose={onClose} title="Save a handoff">
-      <form onSubmit={submit}>
-        <label className="field">
+      <form onSubmit={submit} className="space-y-4">
+        <Label className="flex flex-col items-start gap-2">
           Project ID
           <Input
             required
@@ -61,8 +63,8 @@ export function HandoffEditor({
             onChange={(event) => setProject(event.target.value)}
             placeholder="my-project"
           />
-        </label>
-        <label className="field">
+        </Label>
+        <Label className="flex flex-col items-start gap-2">
           Goal
           <Textarea
             required
@@ -71,8 +73,8 @@ export function HandoffEditor({
             value={goal}
             onChange={(event) => setGoal(event.target.value)}
           />
-        </label>
-        <label className="field">
+        </Label>
+        <Label className="flex flex-col items-start gap-2">
           Current state
           <Textarea
             maxLength={20000}
@@ -80,38 +82,38 @@ export function HandoffEditor({
             value={summary}
             onChange={(event) => setSummary(event.target.value)}
           />
-        </label>
-        <label className="field">
+        </Label>
+        <Label className="flex flex-col items-start gap-2">
           Decisions · one per line
           <Textarea
             rows={3}
             value={decisions}
             onChange={(event) => setDecisions(event.target.value)}
           />
-        </label>
-        <label className="field">
+        </Label>
+        <Label className="flex flex-col items-start gap-2">
           Next steps · one per line
           <Textarea rows={3} value={next} onChange={(event) => setNext(event.target.value)} />
-        </label>
-        <label className="field">
+        </Label>
+        <Label className="flex flex-col items-start gap-2">
           Files, commits, or links · one per line
           <Textarea
             rows={2}
             value={references}
             onChange={(event) => setReferences(event.target.value)}
           />
-        </label>
-        <p className="muted small">
+        </Label>
+        <p className="text-xs text-muted-foreground">
           {item
             ? `Editing version ${item.version} · ${date(item.created_at)} · ${item.author}`
             : 'New project · First revision'}
         </p>
         {save.error && (
-          <p className="error" role="alert">
-            {save.error.message}
-          </p>
+          <Alert variant="destructive">
+            <AlertDescription>{save.error.message}</AlertDescription>
+          </Alert>
         )}
-        <div className="dialog-actions">
+        <div className="flex justify-end gap-2">
           <Button type="button" variant="outline" onClick={onClose}>
             Cancel
           </Button>

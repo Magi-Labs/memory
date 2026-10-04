@@ -1,6 +1,6 @@
 # Personal dashboard
 
-React, TypeScript, Vite, Tailwind CSS, and editable shadcn/ui primitives. API state uses TanStack Query; Phosphor supplies the outline icons. Inter is bundled and served locally. The generated loop mark is a local PNG asset.
+React, TypeScript, Vite, Tailwind CSS, and editable shadcn/ui primitives. React Flow renders the graph and Dagre lays it out. API state uses TanStack Query; Phosphor supplies the outline icons. Inter is bundled and served locally. The generated loop mark is a local PNG asset.
 
 ## Build
 
@@ -22,26 +22,26 @@ For UI development, run `npm run dev`. Vite proxies `/api` to a local gateway on
 
 | Directory | Responsibility |
 | --- | --- |
-| `src/components/ui` | shadcn button, input, and textarea source |
+| `src/components/ui` | Upstream shadcn primitives: controls, dialogs, cards, items, tables, alerts, navigation |
 | `src/components/layout` | Sidebar and breadcrumb/theme controls |
-| `src/components/shared` | Icons, headings, metadata, and native dialogs |
+| `src/components/shared` | Compositions of library components; React error boundary |
 | `src/features/memories` | Search, pagination, source reading pane, extracted facts |
-| `src/features/graph` | Document membership and version graph |
+| `src/features/graph` | React Flow graph, Dagre layout and domain filtering |
 | `src/features/handoffs` | Structured task state and revision editor |
 | `src/features/connections` | Client setup and credential management |
-| `src/lib` | Typed API, data contracts, formatting, graph layout |
+| `src/lib` | Typed API, data contracts and formatting |
 | `src/hooks` | Theme preference |
-| `src/styles` | Tokens plus focused layout/feature styles |
+| `src/styles` | Theme tokens and Tailwind base; no custom component styles |
 | `public/assets` | Logo and theme initialization before paint |
 
-Use the existing primitives and tokens when extending a screen. New backend behavior belongs behind `src/lib/api.ts`; browser components do not contact the memory engine directly. Query keys separate document detail, search, graph, handoff, and credential state. Returning to a section refreshes its server data while retaining the local view.
+All UI controls must use shadcn or another maintained UI library. Feature code may compose library components and bind domain data/state; do not implement new visual primitives or graph pointer interaction. Plain semantic text and layout containers use Tailwind utilities and shared tokens. The old component CSS overrides and handwritten SVG graph were removed. New backend behavior belongs behind `src/lib/api.ts`; browser components do not contact the memory engine directly. Query keys separate document detail, search, graph, handoff, and credential state. Returning to a section refreshes its server data while retaining the local view.
 
 ## Theme and browser behavior
 
 The first visit follows the device's color preference. The Dark mode toggle saves an explicit light/dark choice under `memory-theme`; changes synchronize across tabs. Only the theme preference is persisted in browser storage.
 
-The initialization script, bundle, font, and logo use same-origin assets. Native dialogs retain browser focus/Escape behavior without requiring an inline-style exemption in the gateway's Content Security Policy. Source content is rendered as React text. Newly created bearer tokens stay outside query caches and browser storage and are removed from the page when their dialog closes.
+The initialization script, bundle, font, and logo use same-origin assets. Dialogs and confirmation prompts use shadcn/Radix. The graph uses React Flow's built-in nodes, edges, controls and minimap; it is loaded on demand. The gateway's Content Security Policy remains unchanged. Source content is rendered as React text. Newly created bearer tokens stay outside query caches and browser storage and are removed from the page when their dialog closes.
 
 ## UI source and notices
 
-The selected design and browser comparison evidence live in `../docs/design`; `../design-qa.md` records the visual review and its limits. Those screenshots contain illustrative local documents, not production exports. shadcn components were generated with its CLI and adapted through shared utilities and theme tokens. Upstream notices are retained in `licenses` and copied into the runtime image.
+The selected design and browser comparison evidence live in `../docs/design`; `../design-qa.md` records the visual review and its limits. Those screenshots contain illustrative local documents, not production exports. shadcn components come from its official CLI/registry and use local utility imports, Phosphor icons and theme tokens. React Flow and Dagre are pinned dependencies. Upstream notices are retained in `licenses` and copied into the runtime image.

@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import App from './app'
 import { ErrorBoundary } from '@/components/shared/error-boundary'
 import '@fontsource-variable/inter'
+import '@xyflow/react/dist/style.css'
 import './styles/index.css'
 const client = new QueryClient({
   defaultOptions: {

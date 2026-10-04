@@ -1,75 +1,95 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { Background, Controls, MiniMap, ReactFlow, Position, type Node } from '@xyflow/react'
+import dagre from '@dagrejs/dagre'
 import { api } from '@/lib/api'
 import { date } from '@/lib/format'
-import { graphLayout, type Point } from '@/lib/graph-layout'
+import type { GraphResult } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Label } from '@/components/ui/label'
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
+import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from '@/components/ui/empty'
 import { PageHeading } from '@/components/shared/page-heading'
 import { Metadata } from '@/components/shared/metadata'
 import { DocumentModal } from '@/features/memories/document-modal'
+import { useTheme } from '@/hooks/use-theme'
 
-const emptyGraph = { nodes: [], edges: [], coverage: '' }
+// Filtering is domain logic. Dagre owns layout; React Flow owns rendering and interaction.
+function flowGraph(graph: GraphResult | undefined, query: string, latest: boolean) {
+  let nodes = (graph?.nodes || []).filter(
+    (n) =>
+      !latest ||
+      n.kind === 'document' ||
+      (n.kind === 'memory' && n.data.isLatest !== false && !n.data.isForgotten),
+  )
+  if (query.trim()) {
+    const matched = new Set(
+      nodes
+        .filter((n) => `${n.label} ${n.id}`.toLowerCase().includes(query.trim().toLowerCase()))
+        .map((n) => n.id),
+    )
+    const visible = new Set(matched)
+    for (const e of graph?.edges || [])
+      if (matched.has(e.source) || matched.has(e.target)) {
+        visible.add(e.source)
+        visible.add(e.target)
+      }
+    nodes = nodes.filter((n) => visible.has(n.id))
+  }
+  const ids = new Set(nodes.map((n) => n.id))
+  const edges = (graph?.edges || []).filter((e) => ids.has(e.source) && ids.has(e.target))
+  const layout = new dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}))
+  layout.setGraph({ rankdir: 'LR', nodesep: 25, ranksep: 100 })
+  nodes.forEach((n) => layout.setNode(n.id, { width: 180, height: 80 }))
+  edges.forEach((e) => layout.setEdge(e.source, e.target))
+  dagre.layout(layout)
+  return {
+    nodes: nodes.map((n) => {
+      const p = layout.node(n.id)
+      return {
+        id: n.id,
+        position: { x: p.x - 90, y: p.y - 40 },
+        data: { label: n.label.length > 70 ? n.label.slice(0, 67) + '…' : n.label },
+        ariaLabel: n.label,
+        sourcePosition: Position.Right,
+        targetPosition: Position.Left,
+        style: { width: 180, minHeight: 80 },
+      } satisfies Node
+    }),
+    edges: edges.map((e, i) => ({
+      id: `${e.source}:${e.target}:${i}`,
+      source: e.source,
+      target: e.target,
+      label: e.type === 'previous_version' ? 'Previous version' : undefined,
+      type: 'default',
+    })),
+  }
+}
+
 export function MemoryGraph() {
   const graph = useQuery({ queryKey: ['graph'], queryFn: ({ signal }) => api.graph(signal) })
   const [query, setQuery] = useState('')
   const [latest, setLatest] = useState(false)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [documentId, setDocumentId] = useState<string | null>(null)
-  const [view, setView] = useState({ x: 0, y: 0, scale: 1 })
-  const svg = useRef<SVGSVGElement>(null)
-  const pan = useRef<Point | null>(null)
-  const layout = useMemo(
-    () => graphLayout(graph.data || emptyGraph, query.trim(), latest),
-    [graph.data, query, latest],
-  )
-  const selected = graph.data?.nodes.find((item) => item.id === selectedId)
-  const fit = useCallback(() => {
-    const scale = Math.min(1, 1140 / layout.width, 790 / layout.height)
-    setView({ scale, x: (1200 - layout.width * scale) / 2, y: (850 - layout.height * scale) / 2 })
-  }, [layout])
-  useEffect(fit, [fit])
-  const point = useCallback((event: { clientX: number; clientY: number }) => {
-    const matrix = svg.current?.getScreenCTM()
-    if (!matrix || !svg.current) return { x: 600, y: 425 }
-    const position = svg.current.createSVGPoint()
-    position.x = event.clientX
-    position.y = event.clientY
-    return position.matrixTransform(matrix.inverse())
-  }, [])
-  const zoom = useCallback((factor: number, position: Point = { x: 600, y: 425 }) => {
-    setView((current) => {
-      const scale = Math.max(0.05, Math.min(6, current.scale * factor)),
-        ratio = scale / current.scale
-      return {
-        scale,
-        x: position.x - (position.x - current.x) * ratio,
-        y: position.y - (position.y - current.y) * ratio,
-      }
-    })
-  }, [])
-  useEffect(() => {
-    const element = svg.current
-    const wheel = (event: WheelEvent) => {
-      event.preventDefault()
-      zoom(event.deltaY < 0 ? 1.15 : 1 / 1.15, point(event))
-    }
-    element?.addEventListener('wheel', wheel, { passive: false })
-    return () => element?.removeEventListener('wheel', wheel)
-  }, [zoom, point])
-  const colors = { document: '#406648', memory: '#b0c783', reference: '#b5a9c9' }
+  const { theme } = useTheme()
+  const flow = useMemo(() => flowGraph(graph.data, query, latest), [graph.data, query, latest])
+  const selected = graph.data?.nodes.find((n) => n.id === selectedId)
   const sourceIds =
     selected?.kind === 'document'
       ? [selected.data.id]
       : (graph.data?.edges || [])
-          .filter((edge) => edge.type === 'contains' && edge.target === selectedId)
-          .map((edge) => edge.source.slice(9))
+          .filter((e) => e.type === 'contains' && e.target === selectedId)
+          .map((e) => e.source.slice(9))
   return (
-    <>
+    <div className="space-y-6">
       <PageHeading
-        eyebrow="FOLLOW THE SOURCE"
         title="Memory graph"
-        description="Explore the documents, extracted facts, and version history."
+        description="Explore source documents, extracted facts, and their version history."
         action={
           <Button
             variant="outline"
@@ -80,215 +100,118 @@ export function MemoryGraph() {
           </Button>
         }
       />
-      <div className="graph-toolbar">
+      <div className="flex flex-wrap items-center gap-4">
         <Input
+          className="min-w-48 flex-1"
           type="search"
           value={query}
-          onChange={(event) => setQuery(event.target.value)}
+          onChange={(e) => setQuery(e.target.value)}
           placeholder="Find a node…"
           aria-label="Filter graph nodes"
         />
-        <label>
-          <input
-            type="checkbox"
+        <div className="flex items-center gap-2">
+          <Checkbox
+            id="current-facts"
             checked={latest}
-            onChange={(event) => setLatest(event.target.checked)}
-          />{' '}
-          Current facts only
-        </label>
-        <Button variant="outline" onClick={fit}>
-          Fit
-        </Button>
-        <Button variant="outline" aria-label="Zoom out" onClick={() => zoom(0.8)}>
-          −
-        </Button>
-        <Button variant="outline" aria-label="Zoom in" onClick={() => zoom(1.25)}>
-          +
-        </Button>
-      </div>
-      <div className="graph-workspace">
-        <div className="graph-stage">
-          {layout.nodes.length === 0 && (
-            <div className="graph-state" role="status">
-              <h2>
-                {graph.isPending
-                  ? 'Loading your memory graph…'
-                  : graph.isError
-                    ? 'Could not load the graph'
-                    : graph.data?.nodes.length
-                      ? 'No matching memories'
-                      : 'No memories yet'}
-              </h2>
-              <p>
-                {graph.isPending
-                  ? 'Reading source documents and their extracted facts.'
-                  : graph.isError
-                    ? graph.error.message
-                    : graph.data?.nodes.length
-                      ? 'Change the search or turn off the current-facts filter.'
-                      : 'Saved documents and extracted facts will appear here.'}
-              </p>
-              {graph.isError && (
-                <Button
-                  variant="outline"
-                  disabled={graph.isFetching}
-                  onClick={() => void graph.refetch()}
-                >
-                  Try again
-                </Button>
-              )}
-            </div>
-          )}
-          <svg
-            ref={svg}
-            id="graph-svg"
-            role="img"
-            aria-label="Interactive memory graph"
-            viewBox="0 0 1200 850"
-            onPointerDown={(event) => {
-              if ((event.target as Element).closest('.graph-node')) return
-              const position = point(event)
-              pan.current = { x: position.x - view.x, y: position.y - view.y }
-              event.currentTarget.setPointerCapture(event.pointerId)
-            }}
-            onPointerMove={(event) => {
-              // React may apply this update after pointerup clears the ref.
-              const origin = pan.current
-              if (!origin) return
-              const position = point(event)
-              setView((current) => ({
-                ...current,
-                x: position.x - origin.x,
-                y: position.y - origin.y,
-              }))
-            }}
-            onPointerUp={() => {
-              pan.current = null
-            }}
-            onPointerCancel={() => {
-              pan.current = null
-            }}
-            onLostPointerCapture={() => {
-              pan.current = null
-            }}
-          >
-            <g transform={`translate(${view.x} ${view.y}) scale(${view.scale})`}>
-              {layout.edges.map((edge, index) => {
-                const a = layout.positions.get(edge.source)!,
-                  b = layout.positions.get(edge.target)!
-                return (
-                  <line
-                    key={index}
-                    x1={a.x}
-                    y1={a.y}
-                    x2={b.x}
-                    y2={b.y}
-                    className={`graph-edge${edge.type === 'previous_version' ? ' version' : ''}`}
-                  >
-                    <title>
-                      {edge.type === 'contains'
-                        ? 'Source document contains this memory'
-                        : 'Memory points to its previous version'}
-                    </title>
-                  </line>
-                )
-              })}
-              {layout.nodes.map((item) => {
-                const position = layout.positions.get(item.id)!
-                return (
-                  <g
-                    key={item.id}
-                    transform={`translate(${position.x} ${position.y})`}
-                    className={`graph-node${selectedId === item.id ? ' selected' : ''}`}
-                    tabIndex={0}
-                    role="button"
-                    aria-label={item.label}
-                    onClick={(event) => {
-                      event.stopPropagation()
-                      setSelectedId(item.id)
-                    }}
-                    onKeyDown={(event) => {
-                      if (event.key === 'Enter' || event.key === ' ') {
-                        event.preventDefault()
-                        setSelectedId(item.id)
-                      }
-                    }}
-                  >
-                    <circle
-                      r={item.kind === 'document' ? 14 : 8}
-                      fill={colors[item.kind]}
-                      stroke="var(--paper)"
-                      strokeWidth={2}
-                    />
-                    <title>{item.label}</title>
-                    <text x={0} y={item.kind === 'document' ? 32 : 23} textAnchor="middle">
-                      {item.label.length > 34 ? item.label.slice(0, 31) + '…' : item.label}
-                    </text>
-                  </g>
-                )
-              })}
-            </g>
-          </svg>
-          <div className="graph-hint">Drag to pan · Scroll to zoom · Select a node</div>
+            onCheckedChange={(v) => setLatest(v === true)}
+          />
+          <Label htmlFor="current-facts">Current facts only</Label>
         </div>
-        <aside className="graph-detail">
-          {selected ? (
-            <>
-              <p className="eyebrow">
-                {selected.kind === 'document' ? 'SOURCE DOCUMENT' : 'MEMORY'}
-              </p>
-              <h2>{selected.label}</h2>
-              <Metadata
-                values={[
-                  ['ID', selected.data.id],
-                  ['Version', selected.data.version],
-                  ['Current', selected.data.isLatest],
-                  ['Inferred', selected.data.isInference],
-                  ['Created', selected.data.createdAt ? date(selected.data.createdAt) : null],
-                ]}
-              />
-              {sourceIds.map((id) => (
-                <Button key={id} variant="outline" onClick={() => setDocumentId(id)}>
-                  Open source document
-                </Button>
-              ))}
-            </>
-          ) : (
-            <>
-              <p className="eyebrow">NODE DETAILS</p>
-              <h2>Select a memory</h2>
-              <p className="muted">
-                Connections show actual document membership and previous versions returned by your
-                backend.
-              </p>
-            </>
-          )}
-        </aside>
+        <Badge variant="secondary">{flow.nodes.length} nodes</Badge>
+        <Badge variant="outline">{flow.edges.length} connections</Badge>
       </div>
-      <div className="legend">
-        <span>
-          <i className="legend-document" />
-          Source document
-        </span>
-        <span>
-          <i className="legend-memory" />
-          Extracted fact
-        </span>
-        <span>
-          <i className="legend-reference" />
-          Unavailable reference
-        </span>
-        <span>Solid line: source membership</span>
-        <span>Dashed line: previous version</span>
+      {graph.error && (
+        <Alert variant="destructive">
+          <AlertDescription>{graph.error.message}</AlertDescription>
+        </Alert>
+      )}
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_280px]">
+        <Card className="overflow-hidden p-0">
+          <div className="h-[65vh] min-h-96" aria-label="Memory graph canvas">
+            {flow.nodes.length ? (
+              <ReactFlow
+                key={`${query}:${latest}:${graph.dataUpdatedAt}`}
+                nodes={flow.nodes}
+                edges={flow.edges}
+                fitView
+                minZoom={0.01}
+                maxZoom={2}
+                colorMode={theme}
+                nodesDraggable={false}
+                nodesConnectable={false}
+                onNodeClick={(_, node) => setSelectedId(node.id)}
+                onPaneClick={() => setSelectedId(null)}
+                ariaLabelConfig={{ 'controls.fitView.ariaLabel': 'Fit graph to view' }}
+              >
+                <Background />
+                <Controls showInteractive={false} />
+                <MiniMap pannable zoomable />
+              </ReactFlow>
+            ) : (
+              <Empty className="h-full">
+                <EmptyHeader>
+                  <EmptyTitle>
+                    {graph.isPending
+                      ? 'Loading memory graph…'
+                      : graph.error
+                        ? 'Graph unavailable'
+                        : 'No matching memories'}
+                  </EmptyTitle>
+                  <EmptyDescription>
+                    {graph.isPending
+                      ? 'Reading documents and facts.'
+                      : 'Refresh the graph or change your filters.'}
+                  </EmptyDescription>
+                </EmptyHeader>
+              </Empty>
+            )}
+          </div>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardDescription>{selected?.kind || 'Node details'}</CardDescription>
+            <CardTitle className="break-words">{selected?.label || 'Select a node'}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {selected ? (
+              <>
+                <Metadata
+                  values={[
+                    ['ID', selected.data.id],
+                    ['Version', selected.data.version],
+                    ['Current', selected.data.isLatest],
+                    ['Inferred', selected.data.isInference],
+                    ['Created', selected.data.createdAt ? date(selected.data.createdAt) : null],
+                  ]}
+                />
+                {sourceIds.map((id) => (
+                  <Button key={id} variant="outline" onClick={() => setDocumentId(id)}>
+                    Open source document
+                  </Button>
+                ))}
+              </>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Select a document or fact to inspect its evidence. Connections show source
+                membership and previous versions.
+              </p>
+            )}
+          </CardContent>
+        </Card>
       </div>
-      <p className={graph.error ? 'error' : 'muted'} role="status">
-        {graph.error
-          ? graph.error.message
-          : graph.isFetching
-            ? 'Reading document-linked memories…'
-            : `${layout.nodes.length} visible nodes · ${layout.edges.length} connections. ${graph.data?.coverage || ''}${graph.data?.truncated ? ' Showing at most 1,000 source documents.' : ''}${graph.data?.unavailableDocuments ? ` ${graph.data.unavailableDocuments} document details unavailable.` : ''}`}
-      </p>
+      {graph.data?.truncated && (
+        <Alert>
+          <AlertDescription>Showing the first 1,000 source documents.</AlertDescription>
+        </Alert>
+      )}
+      {!!graph.data?.unavailableDocuments && (
+        <Alert>
+          <AlertDescription>
+            {graph.data.unavailableDocuments} document details unavailable.
+          </AlertDescription>
+        </Alert>
+      )}
       <DocumentModal id={documentId} onClose={() => setDocumentId(null)} />
-    </>
+    </div>
   )
 }

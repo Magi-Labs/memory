@@ -1,19 +1,21 @@
-import { Fragment } from 'react'
+import { Table, TableBody, TableRow, TableCell } from '@/components/ui/table'
 export function Metadata({
   values,
 }: {
   values: [string, string | number | boolean | undefined | null][]
 }) {
   return (
-    <dl className="metadata">
-      {values
-        .filter(([, value]) => value !== undefined && value !== null)
-        .map(([label, value]) => (
-          <Fragment key={label}>
-            <dt>{label}</dt>
-            <dd>{String(value)}</dd>
-          </Fragment>
-        ))}
-    </dl>
+    <Table>
+      <TableBody>
+        {values
+          .filter(([, value]) => value !== undefined && value !== null)
+          .map(([label, value]) => (
+            <TableRow key={label}>
+              <TableCell className="text-muted-foreground">{label}</TableCell>
+              <TableCell className="whitespace-normal break-all">{String(value)}</TableCell>
+            </TableRow>
+          ))}
+      </TableBody>
+    </Table>
   )
 }

@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { api } from '@/lib/api'
 import { Modal } from '@/components/shared/modal'
 import { DocumentContent } from './document-content'
@@ -16,9 +17,9 @@ export function DocumentModal({ id, onClose }: { id: string | null; onClose: () 
       title={source.isPending ? 'Loading document…' : source.data?.title || 'Source document'}
     >
       {source.error && (
-        <p role="alert" className="error">
-          {source.error.message}
-        </p>
+        <Alert variant="destructive">
+          <AlertDescription>{source.error.message}</AlertDescription>
+        </Alert>
       )}
       {source.data && <DocumentContent source={source.data} />}
     </Modal>

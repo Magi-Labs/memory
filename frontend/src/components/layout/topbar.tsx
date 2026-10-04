@@ -9,11 +9,11 @@ import { views } from './sidebar'
 export function Topbar({ view }: { view: View }) {
   const { theme, toggle } = useTheme()
   return (
-    <header className="topbar">
-      <div className="topbar-path">
+    <header className="flex h-14 shrink-0 items-center justify-between gap-4 border-b px-4 lg:px-6">
+      <div className="flex min-w-0 items-center gap-3 text-sm">
         <SidebarTrigger />
         <Separator orientation="vertical" className="h-4!" />
-        <span className="breadcrumb-parent">
+        <span className="hidden items-center gap-3 text-muted-foreground sm:flex">
           Personal space <span aria-hidden="true">/</span>
         </span>
         <span id="current-view">{views.find((item) => item.id === view)?.title}</span>
@@ -22,7 +22,7 @@ export function Topbar({ view }: { view: View }) {
         id="theme-toggle"
         variant="ghost"
         size="icon"
-        className="theme-toggle"
+
         aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
         title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
         onClick={toggle}

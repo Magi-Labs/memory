@@ -3,6 +3,11 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/api'
 import { date, excerpt, resultText, sourceName } from '@/lib/format'
 import type { SourceDocument } from '@/lib/types'
+import { Card, CardContent, CardDescription } from '@/components/ui/card'
+import { Item, ItemContent, ItemDescription } from '@/components/ui/item'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Empty, EmptyHeader, EmptyDescription } from '@/components/ui/empty'
+import { Pagination, PaginationContent, PaginationItem } from '@/components/ui/pagination'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Icon } from '@/components/shared/icon'
@@ -78,7 +83,7 @@ export function MemoryBrowser() {
     selected?.focus()
   }
   return (
-    <>
+    <div className="space-y-6">
       <PageHeading
         title="Your memories"
         description="A shared place for what your agents should remember."
@@ -94,9 +99,8 @@ export function MemoryBrowser() {
           </Button>
         }
       />
-      <form className="searchbar" onSubmit={submit}>
-        <label className="search-input">
-          <Icon name="search" />
+      <form className="flex flex-wrap gap-2" onSubmit={submit}>
+        <div className="flex-1 min-w-48">
           <Input
             id="query"
             type="search"
@@ -106,7 +110,7 @@ export function MemoryBrowser() {
             placeholder="Search facts, preferences, and past decisions…"
             aria-label="Search memories"
           />
-        </label>
+        </div>
         <Button type="submit" disabled={result.isFetching}>
           Search
         </Button>
@@ -124,78 +128,96 @@ export function MemoryBrowser() {
           Show all
         </Button>
       </form>
-      <div className={`memory-workspace${selection ? ' has-detail' : ''}`}>
-        <div className="memory-library">
-          <div className="section-label">
-            <span id="memory-count" role="status">
-              {result.isFetching
-                ? search
-                  ? 'Searching…'
-                  : 'Loading documents…'
-                : `${total} ${search ? 'search results' : 'source documents'}`}
-            </span>
-          </div>
-          <div
-            className="memory-list"
-            id="memory-list"
-            ref={list}
-            aria-label="Source documents"
-            aria-busy={result.isFetching}
-          >
-            {result.error && (
-              <p className="empty error" role="alert">
-                {result.error.message}
-              </p>
-            )}
-            {!result.isPending && !result.error && !rows.length && (
-              <p className="empty">
-                {search
-                  ? 'No relevant memories found. Try a more specific query.'
-                  : 'No memories yet. Save your first durable memory through a connected agent.'}
-              </p>
-            )}
-            {rows.map((row) => (
-              <Button
-                key={row.key}
-                variant="ghost"
-                className={`memory-row${selection?.key === row.key ? ' selected' : ''}`}
-                aria-pressed={selection?.key === row.key}
-                aria-controls="memory-detail"
-                onClick={() => setSelection(row)}
-              >
-                <Icon name="document" />
-                <div className="memory-row-copy">
-                  <h3 title={row.title}>{row.title}</h3>
-                  <p>{row.preview}</p>
-                  <span className="row-meta">{row.meta}</span>
-                </div>
-              </Button>
-            ))}
-          </div>
-          {!search && pages > 1 && (
-            <div className="pagination">
-              <Button
-                variant="outline"
-                disabled={page <= 1 || result.isFetching}
-                onClick={() => setPage(page - 1)}
-              >
-                Previous
-              </Button>
-              <span>
-                Page {page} of {pages}
+      <div className="grid items-start gap-4 lg:grid-cols-2">
+        <Card className="min-w-0">
+          <CardContent className="space-y-4">
+            <CardDescription>
+              <span id="memory-count" role="status">
+                {result.isFetching
+                  ? search
+                    ? 'Searching…'
+                    : 'Loading documents…'
+                  : `${total} ${search ? 'search results' : 'source documents'}`}
               </span>
-              <Button
-                variant="outline"
-                disabled={page >= pages || result.isFetching}
-                onClick={() => setPage(page + 1)}
-              >
-                Next
-              </Button>
+            </CardDescription>
+            <div
+              className="max-h-[65vh] space-y-2 overflow-y-auto"
+              id="memory-list"
+              ref={list}
+              aria-label="Source documents"
+              aria-busy={result.isFetching}
+            >
+              {result.error && (
+                <Alert variant="destructive">
+                  <AlertDescription>{result.error.message}</AlertDescription>
+                </Alert>
+              )}
+              {!result.isPending && !result.error && !rows.length && (
+                <Empty>
+                  <EmptyHeader>
+                    <EmptyDescription>
+                      {search
+                        ? 'No relevant memories found. Try a more specific query.'
+                        : 'No memories yet. Save your first durable memory through a connected agent.'}
+                    </EmptyDescription>
+                  </EmptyHeader>
+                </Empty>
+              )}
+              {rows.map((row) => (
+                <Item
+                  key={row.key}
+                  variant="outline"
+                  className={selection?.key === row.key ? 'bg-accent' : ''}
+                >
+                  <ItemContent className="min-w-0">
+                    <Button
+                      variant="link"
+                      className="h-auto justify-start whitespace-normal p-0 text-left"
+                      aria-pressed={selection?.key === row.key}
+                      aria-controls="memory-detail"
+                      onClick={() => setSelection(row)}
+                    >
+                      {row.title}
+                    </Button>
+                    <ItemDescription>{row.preview}</ItemDescription>
+                    <p className="text-xs text-muted-foreground">{row.meta}</p>
+                  </ItemContent>
+                </Item>
+              ))}
             </div>
-          )}
-        </div>
+            {!search && pages > 1 && (
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <Button
+                      variant="outline"
+                      disabled={page <= 1 || result.isFetching}
+                      onClick={() => setPage(page - 1)}
+                    >
+                      Previous
+                    </Button>
+                  </PaginationItem>
+                  <PaginationItem>
+                    <span className="px-2 text-sm">
+                      Page {page} of {pages}
+                    </span>
+                  </PaginationItem>
+                  <PaginationItem>
+                    <Button
+                      variant="outline"
+                      disabled={page >= pages || result.isFetching}
+                      onClick={() => setPage(page + 1)}
+                    >
+                      Next
+                    </Button>
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            )}
+          </CardContent>
+        </Card>
         <MemoryDetail selection={selection} onClose={closeDetail} />
       </div>
-    </>
+    </div>
   )
 }
