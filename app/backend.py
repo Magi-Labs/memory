@@ -63,7 +63,8 @@ class SupermemoryBackend:
         rows, page, total = [], 1, 0
         while len(rows) < max_documents:
             result = await self.list(page, min(200, max_documents - len(rows)))
-            batch = result.get("documents", [])
+            # Supermemory lists source documents under `memories`.
+            batch = result.get("documents") or result.get("memories") or []
             total = result.get("pagination", {}).get("totalItems", len(rows) + len(batch))
             rows.extend(batch)
             if not batch or len(rows) >= total:

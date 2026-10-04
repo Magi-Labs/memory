@@ -108,6 +108,33 @@ export function MemoryGraph() {
       </div>
       <div className="graph-workspace">
         <div className="graph-stage">
+          {layout.nodes.length === 0 && (
+            <div className="graph-state" role="status">
+              <h2>
+                {graph.isPending
+                  ? 'Loading your memory graph…'
+                  : graph.isError
+                    ? 'Could not load the graph'
+                    : graph.data?.nodes.length
+                      ? 'No matching memories'
+                      : 'No memories yet'}
+              </h2>
+              <p>
+                {graph.isPending
+                  ? 'Reading source documents and their extracted facts.'
+                  : graph.isError
+                    ? graph.error.message
+                    : graph.data?.nodes.length
+                      ? 'Change the search or turn off the current-facts filter.'
+                      : 'Saved documents and extracted facts will appear here.'}
+              </p>
+              {graph.isError && (
+                <Button variant="outline" disabled={graph.isFetching} onClick={() => void graph.refetch()}>
+                  Try again
+                </Button>
+              )}
+            </div>
+          )}
           <svg
             ref={svg}
             id="graph-svg"
