@@ -54,6 +54,8 @@ The Compose service is the control plane only; it does not install or reset the 
 
 Frontend development and the component structure are documented in [frontend/README.md](frontend/README.md). Docker compiles the UI during its build; a local Python checkout requires `npm ci && npm run build` from `frontend` first.
 
+Public development setup and change conventions are in [CONTRIBUTING.md](CONTRIBUTING.md). See the [API contract](docs/API.md), [security policy](SECURITY.md) and [standards alignment record](docs/STANDARDS.md). Private maintainer access is not required to build or contribute.
+
 ## Agent workflow
 
 Before starting a task:

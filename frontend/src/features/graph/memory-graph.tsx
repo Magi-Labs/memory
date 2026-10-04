@@ -11,6 +11,7 @@ import {
 } from 'd3-force'
 import { api } from '@/lib/api'
 import { date } from '@/lib/format'
+import { factStatusLabel, isLatestFact } from '@/lib/fact-status'
 import type { GraphResult } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -28,10 +29,7 @@ import { useTheme } from '@/hooks/use-theme'
 // Filtering is domain logic. D3 owns layout; React Flow owns rendering and interaction.
 function flowGraph(graph: GraphResult | undefined, query: string, latest: boolean) {
   let nodes = (graph?.nodes || []).filter(
-    (n) =>
-      !latest ||
-      n.kind === 'document' ||
-      (n.kind === 'memory' && n.data.isLatest !== false && !n.data.isForgotten),
+    (n) => !latest || n.kind === 'document' || (n.kind === 'memory' && isLatestFact(n.data)),
   )
   if (query.trim()) {
     const matched = new Set(
@@ -134,7 +132,7 @@ export function MemoryGraph() {
             checked={latest}
             onCheckedChange={(v) => setLatest(v === true)}
           />
-          <Label htmlFor="current-facts">Current facts only</Label>
+          <Label htmlFor="current-facts">Latest versions only</Label>
         </div>
         <Badge variant="secondary">{flow.nodes.length} nodes</Badge>
         <Badge variant="outline">{flow.edges.length} connections</Badge>
@@ -197,8 +195,14 @@ export function MemoryGraph() {
                 <Metadata
                   values={[
                     ['ID', selected.data.id],
-                    ['Version', selected.data.version],
-                    ['Current', selected.data.isLatest],
+                    [
+                      'Version',
+                      selected.kind === 'memory' ? (selected.data.version ?? 'Unknown') : null,
+                    ],
+                    [
+                      'Version status',
+                      selected.kind === 'memory' ? factStatusLabel(selected.data) : null,
+                    ],
                     ['Inferred', selected.data.isInference],
                     ['Created', selected.data.createdAt ? date(selected.data.createdAt) : null],
                   ]}
@@ -218,6 +222,9 @@ export function MemoryGraph() {
           </CardContent>
         </Card>
       </div>
+      {graph.data?.coverage && (
+        <p className="text-xs text-muted-foreground">{graph.data.coverage}</p>
+      )}
       {graph.data?.truncated && (
         <Alert>
           <AlertDescription>Showing the first 1,000 source documents.</AlertDescription>

@@ -1,5 +1,7 @@
 # Client integrations
 
+Implemented inputs, permissions, response boundaries and retry behavior are documented in [API.md](API.md). Configuration examples below do not extend that contract.
+
 One token per agent/device. Create tokens in the owner dashboard's Connections view; keep them in local secret storage. Examples contain placeholders. Configuration support documented upstream is not evidence that every client has been connected to this deployment.
 
 ## Codex

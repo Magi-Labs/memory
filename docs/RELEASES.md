@@ -1,8 +1,16 @@
 # Release notes
 
+## Standards alignment — 5 October 2026 (not deployed)
+
+Reviewed against shared standards revision `783936b1e566dc0ccefe41c511e4790ffd1efd77`; see [scope and evidence](STANDARDS.md). Added public contribution/security guidance, a PR template and the current API/tool contract. Updated architecture/ADR status, the agent instruction revision and Git/Docker secret exclusions. GitHub description/topics now describe the implemented prototype, all 10 shared labels match, and private vulnerability reporting is enabled.
+
+The UI no longer invents Current/v1 metadata when the backend omits it. It distinguishes latest, historical, forgotten and unknown version state, labels summary fallbacks when source text is unavailable, and displays backend graph coverage. Latest-version filtering requires an explicit latest flag. The MCP read-tool description now distinguishes container access from truth verification.
+
+Local TypeScript/Vite build passed. No automated tests, new browser/mobile observations, Docker build, runtime mutation or production deployment were performed for this change. No data/schema migration is required. Deployment remains a separate step; the last recorded gateway deployment is `c7ca73b` on 4 October. Reverting these source changes does not alter stored memories or credential state.
+
 ## Library UI and owned-engine design — 4 October 2026
 
-Source revisions: `b680c69`, `c7ca73b`. Current deployed release: `20261004-c7ca73b`.
+Source revisions: `b680c69`, `c7ca73b`. Recorded deployed release on this date: `20261004-c7ca73b`.
 
 All feature controls now compose upstream shadcn components, including dialogs, credential revocation confirmation, forms, cards/items, badges, alerts, accordions, tables and pagination. The custom SVG/pointer graph was replaced by React Flow's default nodes, edges, controls and minimap. D3 force supplies layout; the initial Dagre layout rendered this dataset in an excessively narrow column and was replaced. Graph code is loaded on demand. Seven bespoke component CSS files and the handwritten graph layout were removed. Theme tokens and Tailwind composition remain. The policy is recorded in AGENTS.md and frontend/README.md.
 
@@ -36,7 +44,7 @@ The new multi-stage Docker image compiles the frontend using Node 24, then serve
 
 The upgrade helper retained the engine configuration, memory data, owner login hashes, credential hashes, and persistent control-state mount. It saved the restricted configuration backup at `backups/memory-project-20261004-23410d9`. This release changes dashboard serving paths without relaxing the existing Content Security Policy or API authorization/origin checks.
 
-LiveMCP in Personal Arc rendered the deployed Connections page at `https://memory.deepaksilaych.me/#connections`, including the self-hosted assets, dark theme, and endpoint returned by the owner API. No credentials were created or revoked, and no memories or handoffs were submitted during the UI review.
+LiveMCP in Arc rendered the deployed Connections page (`#connections`), including the self-hosted assets, dark theme, and endpoint returned by the owner API. No credentials were created or revoked, and no memories or handoffs were submitted during the UI review.
 
 The selected visual reference and illustrative local browser comparisons are recorded in [design QA](../design-qa.md). No automated tests, end-to-end MCP/client flows, or credential/handoff mutation flows were run. Build, startup, and browser rendering observations do not establish complete functional verification.
 

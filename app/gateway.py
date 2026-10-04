@@ -66,7 +66,7 @@ async def add_memory(content: str) -> dict:
 
 @mcp.tool()
 async def get_memory(memory_id: str) -> dict:
-    """Read a verified source document and its extracted memories."""
+    """Read a source document and extracted memories after checking personal-space access. Extracted or latest facts are not independently verified truth."""
     require("read")
     return await backend.get(memory_id)
 

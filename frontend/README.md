@@ -42,6 +42,10 @@ The first visit follows the device's color preference. The Dark mode toggle save
 
 The initialization script, bundle, font, and logo use same-origin assets. Dialogs and confirmation prompts use shadcn/Radix. The graph uses React Flow's built-in nodes, edges, controls and minimap; it is loaded on demand. The gateway's Content Security Policy remains unchanged. Source content is rendered as React text. Newly created bearer tokens stay outside query caches and browser storage and are removed from the page when their dialog closes.
 
+## Evidence presentation
+
+Fact badges distinguish latest, historical, forgotten and unknown version state; missing version numbers stay unknown. Latest does not imply factual verification. The latest-version graph filter requires an explicit latest flag and excludes facts marked forgotten. Source summaries are labeled when original text is unavailable, and graph coverage is displayed from the backend. These are application data semantics composed with library components.
+
 ## UI source and notices
 
 The selected design and browser comparison evidence live in `../docs/design`; `../design-qa.md` records the visual review and its limits. Those screenshots contain illustrative local documents, not production exports. shadcn components come from its official CLI/registry and use local utility imports, Phosphor icons and theme tokens. React Flow and D3 force are pinned dependencies. Upstream notices are retained in `licenses` and copied into the runtime image.

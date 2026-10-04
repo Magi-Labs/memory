@@ -2,6 +2,10 @@
 
 Decision date: 3 October 2026. Scope: one human with multiple devices, clients, projects, and conversations.
 
+## Implementation and deployment status — reviewed 5 October 2026
+
+The implementation remains the FastAPI/FastMCP gateway, SQLite control store and Supermemory adapter described below. The last recorded deployment is gateway source `c7ca73b`, observed on 4 October; this review does not re-observe production. Later repository documentation and evidence-labeling changes are not automatically deployed. See [release notes](RELEASES.md) for build/runtime evidence and [API.md](API.md) for contracts, retries, errors and graph coverage.
+
 ## Owned-engine direction — 4 October 2026
 
 The replacement design is recorded in [ADR 0002](decisions/0002-owned-memory-engine.md): PostgreSQL source journal, durable jobs, full-text search, optional pgvector/LLM processing, and evidence-backed facts/relationships. It is a proposed implementation; Supermemory remains the active backend. The UI now uses shadcn primitives and React Flow + D3.
@@ -47,6 +51,8 @@ Only the Supermemory adapter is implemented. Other engines would need normalizat
 ### 4. Inspection UI
 
 The dashboard has documents/search, graph, handoffs, and connections. Its graph displays facts attached to their source documents and parent-version relationships returned by the backend. IDs with no accessible content appear as unavailable references. It does not infer graph edges from similar words or turn an inference into a verified fact.
+
+Source code now preserves unknown fact status/version and labels summary fallbacks when source text is unavailable. Latest-version filtering requires an explicit backend latest flag and excludes facts marked forgotten. These labels describe metadata, not independent confirmation. This correction is pending deployment as recorded in the release notes.
 
 Credential status means issued/revoked; last-used means an authenticated request was observed. It does not establish that a client's tools loaded or that a task was completed successfully.
 

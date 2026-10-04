@@ -1,5 +1,6 @@
 import type { SourceDocument } from '@/lib/types'
 import { date, sourceName } from '@/lib/format'
+import { factStatusLabel } from '@/lib/fact-status'
 import { Metadata } from '@/components/shared/metadata'
 import { Badge } from '@/components/ui/badge'
 import { Item, ItemContent, ItemDescription, ItemGroup } from '@/components/ui/item'
@@ -14,31 +15,41 @@ import { Separator } from '@/components/ui/separator'
 export function DocumentContent({ source }: { source: SourceDocument }) {
   const observed = source.updatedAt || source.createdAt
   const facts = source.memories || []
+  const originalText = source.content || source.raw
   return (
     <div className="space-y-6">
       <p className="text-xs text-muted-foreground">
         {sourceName(source)}
         {observed && ` · ${date(observed, true)}`}
       </p>
-      <p className="whitespace-pre-wrap break-words text-sm leading-7">
-        {source.content || source.raw || source.summary || 'No source text available.'}
-      </p>
+      <div className="space-y-2">
+        <p className="text-xs text-muted-foreground">
+          {originalText ? 'Source text' : 'Original source text unavailable'}
+          {!originalText && source.summary && ' · Showing a summary'}
+        </p>
+        <p className="whitespace-pre-wrap break-words text-sm leading-7">
+          {originalText || source.summary || 'No source text available.'}
+        </p>
+      </div>
       <Separator />
       <Accordion type="multiple" defaultValue={['facts']}>
         <AccordionItem value="facts">
           <AccordionTrigger>Extracted facts ({facts.length})</AccordionTrigger>
           <AccordionContent>
+            <p className="mb-3 text-xs text-muted-foreground">
+              Latest describes version history, not independently verified truth.
+            </p>
             <ItemGroup className="gap-2">
               {facts.map((fact, index) => (
                 <Item variant="muted" key={fact.id || index}>
                   <ItemContent>
                     <p className="text-sm leading-6">{fact.memory}</p>
                     <div className="flex flex-wrap gap-2">
-                      <Badge variant="outline">
-                        {fact.isLatest === false ? 'Historical' : 'Current'}
-                      </Badge>
+                      <Badge variant="outline">{factStatusLabel(fact)}</Badge>
                       {fact.isInference && <Badge variant="secondary">Inferred</Badge>}
-                      <Badge variant="outline">v{fact.version || 1}</Badge>
+                      <Badge variant="outline">
+                        {fact.version == null ? 'Version unknown' : `v${fact.version}`}
+                      </Badge>
                     </div>
                   </ItemContent>
                 </Item>

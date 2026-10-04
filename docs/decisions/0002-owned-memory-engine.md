@@ -2,6 +2,8 @@
 
 Date: 4 October 2026
 Status: Proposed implementation design. Supermemory remains the active production engine.
+Implementation: Not started; no owned PostgreSQL backend or structured entity/relationship submission tool is implemented.
+Deployment: Not deployed; no engine migration has occurred.
 Scope: One owner, multiple devices and agents. This decision does not create an organization product.
 
 ## Decision
