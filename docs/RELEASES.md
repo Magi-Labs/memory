@@ -1,5 +1,15 @@
 # Release notes
 
+## Library UI and owned-engine design — 4 October 2026
+
+Source revisions: `b680c69`, `c7ca73b`. Current deployed release: `20261004-c7ca73b`.
+
+All feature controls now compose upstream shadcn components, including dialogs, credential revocation confirmation, forms, cards/items, badges, alerts, accordions, tables and pagination. The custom SVG/pointer graph was replaced by React Flow's default nodes, edges, controls and minimap. D3 force supplies layout; the initial Dagre layout rendered this dataset in an excessively narrow column and was replaced. Graph code is loaded on demand. Seven bespoke component CSS files and the handwritten graph layout were removed. Theme tokens and Tailwind composition remain. The policy is recorded in AGENTS.md and frontend/README.md.
+
+Local TypeScript/Vite and production Docker builds completed. Only the gateway was recreated, with backup `backups/memory-project-20261004-c7ca73b`. No automated tests or complete interaction/mobile verification were run. The memory engine, control data, credentials and provider settings remain unchanged.
+
+[ADR 0002](decisions/0002-owned-memory-engine.md) designs an owned PostgreSQL memory engine with canonical sources, jobs, optional pgvector/LLM stages, evidence-backed facts, context assembly, and migration/rollback gates. It is a design deliverable; no PostgreSQL backend or engine migration is claimed as implemented.
+
 ## Dashboard shell and graph recovery — 4 October 2026
 
 Deployed source revision: `a0634a6`, release `20261004-a0634a6-r2`. The shell now adapts the official shadcn dashboard-01 composition with SidebarProvider/SidebarInset, collapsible navigation, a mobile Sheet, and the existing logo and theme. The old sidebar styling was removed. Upstream notices remain in the image.
