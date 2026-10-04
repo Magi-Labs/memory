@@ -28,7 +28,12 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
       ...options.headers,
     },
   })
-  const data = await response.json().catch(() => ({}))
+  const data = await response.json().catch(() => {
+    throw new ApiError(
+      `The server returned an unreadable response (${response.status}). Please retry.`,
+      response.status,
+    )
+  })
   if (!response.ok) {
     const validation = Array.isArray(data.detail)
       ? data.detail

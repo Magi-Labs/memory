@@ -10,6 +10,16 @@
 @import './themes.css';
 @custom-variant dark (&:is(.dark *));
 @theme inline {
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--ink);
+  --color-sidebar-primary: var(--accent);
+  --color-sidebar-primary-foreground: var(--on-accent);
+  --color-sidebar-accent: var(--selected);
+  --color-sidebar-accent-foreground: var(--accent);
+  --color-sidebar-border: var(--line);
+  --color-sidebar-ring: var(--accent);
+  --color-popover: var(--surface);
+  --color-popover-foreground: var(--ink);
   --color-background: var(--paper);
   --color-foreground: var(--ink);
   --color-primary: var(--accent);

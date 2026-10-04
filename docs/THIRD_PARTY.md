@@ -14,6 +14,6 @@ FastAPI, the MCP Python SDK, httpx, and uvicorn are installed as dependencies; t
 
 ## Frontend
 
-The dashboard uses React, TanStack Query, Tailwind CSS, Radix UI, and other packages pinned in `frontend/package-lock.json`. shadcn/ui button, input, and textarea source was generated with its CLI and adapted locally. Its MIT notice and the Phosphor Icons MIT notice are retained in `frontend/licenses`. The self-hosted Inter font's SIL Open Font License is retained there as well. Runtime images include these notices in `/app/ui/licenses`.
+The dashboard uses React, TanStack Query, Tailwind CSS, Radix UI, and other packages pinned in `frontend/package-lock.json`. shadcn/ui button, input, and textarea source was generated with its CLI and adapted locally. The shell adapts the official [dashboard-01 block](https://ui.shadcn.com/blocks?category=dashboard), with sidebar, sheet, separator, tooltip, skeleton, and use-mobile source from the official new-york-v4 registry (4 October 2026). Imports and icons are adapted to the existing local utilities and Phosphor set. Its MIT notice and the Phosphor Icons MIT notice are retained in `frontend/licenses`. The self-hosted Inter font's SIL Open Font License is retained there as well. Runtime images include these notices in `/app/ui/licenses`.
 
 The loop logo was generated from the user's selected design direction; it is stored as a PNG. Standard outline icons come from the Phosphor React package. No memory engine source, private source documents, or API credentials are part of the frontend.

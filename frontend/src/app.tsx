@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import type { View } from '@/lib/types'
 import { Sidebar, views } from '@/components/layout/sidebar'
+import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
+import { ErrorBoundary } from '@/components/shared/error-boundary'
 import { Topbar } from '@/components/layout/topbar'
 import { MemoryBrowser } from '@/features/memories/memory-browser'
 import { MemoryGraph } from '@/features/graph/memory-graph'
@@ -42,39 +44,55 @@ export default function App() {
     return () => clearTimeout(timer)
   }, [notice])
   return (
-    <div className="shell">
+    <SidebarProvider className="dashboard-shell">
       <Sidebar view={view} onNavigate={navigate} />
-      <main>
+      <SidebarInset className="dashboard-main">
         <Topbar view={view} />
-        {notice && (
-          <div id="notice" className={notice.error ? 'error' : ''} role="status" aria-live="polite">
-            {notice.message}
-          </div>
-        )}
-        {visited.has('memories') && (
-          <section className="tab" hidden={view !== 'memories'}>
-            <MemoryBrowser />
-          </section>
-        )}
-        {visited.has('graph') && (
-          <section className="tab" hidden={view !== 'graph'}>
-            <MemoryGraph />
-          </section>
-        )}
-        {visited.has('handoffs') && (
-          <section className="tab" hidden={view !== 'handoffs'}>
-            <HandoffsView notify={notify} />
-          </section>
-        )}
-        {visited.has('connections') && (
-          <section className="tab" hidden={view !== 'connections'}>
-            <ConnectionsView notify={notify} />
-          </section>
-        )}
-        <footer>
-          Memory is context to review. Your current instructions and verified state take precedence.
-        </footer>
-      </main>
-    </div>
+        <div className="dashboard-content">
+          {notice && (
+            <div
+              id="notice"
+              className={notice.error ? 'error' : ''}
+              role="status"
+              aria-live="polite"
+            >
+              {notice.message}
+            </div>
+          )}
+          {visited.has('memories') && (
+            <section className="tab" hidden={view !== 'memories'}>
+              <ErrorBoundary name="Memories">
+                <MemoryBrowser />
+              </ErrorBoundary>
+            </section>
+          )}
+          {visited.has('graph') && (
+            <section className="tab" hidden={view !== 'graph'}>
+              <ErrorBoundary name="Memory graph">
+                <MemoryGraph />
+              </ErrorBoundary>
+            </section>
+          )}
+          {visited.has('handoffs') && (
+            <section className="tab" hidden={view !== 'handoffs'}>
+              <ErrorBoundary name="Handoffs">
+                <HandoffsView notify={notify} />
+              </ErrorBoundary>
+            </section>
+          )}
+          {visited.has('connections') && (
+            <section className="tab" hidden={view !== 'connections'}>
+              <ErrorBoundary name="Connections">
+                <ConnectionsView notify={notify} />
+              </ErrorBoundary>
+            </section>
+          )}
+          <footer>
+            Memory is context to review. Your current instructions and verified state take
+            precedence.
+          </footer>
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
   )
 }

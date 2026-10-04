@@ -129,7 +129,11 @@ export function MemoryGraph() {
                       : 'Saved documents and extracted facts will appear here.'}
               </p>
               {graph.isError && (
-                <Button variant="outline" disabled={graph.isFetching} onClick={() => void graph.refetch()}>
+                <Button
+                  variant="outline"
+                  disabled={graph.isFetching}
+                  onClick={() => void graph.refetch()}
+                >
                   Try again
                 </Button>
               )}
@@ -148,18 +152,23 @@ export function MemoryGraph() {
               event.currentTarget.setPointerCapture(event.pointerId)
             }}
             onPointerMove={(event) => {
-              if (!pan.current) return
+              // React may apply this update after pointerup clears the ref.
+              const origin = pan.current
+              if (!origin) return
               const position = point(event)
               setView((current) => ({
                 ...current,
-                x: position.x - pan.current!.x,
-                y: position.y - pan.current!.y,
+                x: position.x - origin.x,
+                y: position.y - origin.y,
               }))
             }}
             onPointerUp={() => {
               pan.current = null
             }}
             onPointerCancel={() => {
+              pan.current = null
+            }}
+            onLostPointerCapture={() => {
               pan.current = null
             }}
           >

@@ -1,43 +1,9 @@
 @media (min-width: 1600px) {
-  main {
-    padding: 0 48px;
-  }
   .memory-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 @media (max-width: 1100px) {
-  .shell {
-    grid-template-columns: 220px minmax(0, 1fr);
-  }
-  .sidebar {
-    padding: 28px 12px 22px;
-  }
-  .brand {
-    font-size: 27px;
-    gap: 8px;
-    padding: 0 6px;
-  }
-  .brand-mark {
-    width: 44px;
-    height: 36px;
-  }
-  .brand small {
-    font-size: 11px;
-  }
-  .nav[data-slot='button'] {
-    font-size: 14px;
-    gap: 12px;
-    min-height: 46px;
-    padding: 11px 14px;
-  }
-  .nav .icon {
-    width: 22px;
-    height: 22px;
-  }
-  main {
-    padding: 0 26px;
-  }
   .memory-library {
     padding-right: 14px;
   }
@@ -86,69 +52,6 @@
   }
 }
 @media (max-width: 760px) {
-  .shell {
-    display: block;
-  }
-  .sidebar {
-    height: auto;
-    min-height: 0;
-    position: static;
-    border-right: 0;
-    border-bottom: 1px solid var(--line);
-    padding: 18px 16px 12px;
-  }
-  .brand {
-    font-size: 25px;
-    padding: 0;
-  }
-  .brand-mark {
-    width: 40px;
-    height: 32px;
-  }
-  .brand small {
-    font-size: 10px;
-    margin-top: 3px;
-  }
-  .sidebar-label,
-  .sidebar-bottom {
-    display: none;
-  }
-  .sidebar nav {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 4px;
-    padding: 4px 0;
-    margin-top: 18px;
-    scrollbar-width: thin;
-  }
-  .nav[data-slot='button'] {
-    padding: 9px 11px;
-    font-size: 13px;
-    gap: 7px;
-    width: 100%;
-    flex: 0 0 auto;
-    min-height: 40px;
-  }
-  .nav.active::before {
-    left: 8px;
-    right: 8px;
-    bottom: 0;
-    top: auto;
-    width: auto;
-    height: 2px;
-  }
-  .nav .icon {
-    width: 18px;
-    height: 18px;
-  }
-  main {
-    padding: 0 20px;
-  }
-  .topbar {
-    height: 52px;
-    margin-bottom: 10px;
-    font-size: 11px;
-  }
   h1 {
     font-size: 29px;
   }
@@ -248,5 +151,23 @@
 @media (prefers-reduced-motion: reduce) {
   button {
     transition: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .dashboard-content {
+    padding: 20px 16px;
+  }
+  .dashboard-main {
+    border: 0;
+  }
+  .topbar {
+    padding: 0 16px;
+  }
+  .breadcrumb-parent {
+    display: none;
+  }
+  .heading {
+    flex-wrap: wrap;
   }
 }

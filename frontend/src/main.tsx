@@ -1,6 +1,7 @@
 import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import App from './app'
+import { ErrorBoundary } from '@/components/shared/error-boundary'
 import '@fontsource-variable/inter'
 import './styles/index.css'
 const client = new QueryClient({
@@ -11,6 +12,8 @@ const client = new QueryClient({
 })
 createRoot(document.getElementById('root')!).render(
   <QueryClientProvider client={client}>
-    <App />
+    <ErrorBoundary name="Workspace">
+      <App />
+    </ErrorBoundary>
   </QueryClientProvider>,
 )

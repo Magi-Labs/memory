@@ -4,19 +4,6 @@ button {
 button:hover {
   background: var(--accent-hover);
 }
-.nav[data-slot='button'] {
-  color: var(--nav-ink);
-}
-.nav:hover {
-  background: var(--nav-hover);
-}
-.nav.active {
-  background: var(--selected);
-  color: var(--accent);
-}
-.workspace-identity {
-  border-top-color: var(--line);
-}
 .search-input {
   border-color: var(--line);
   color: var(--muted);
