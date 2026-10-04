@@ -1,5 +1,7 @@
 # Memory
 
+**Companion repository:** [Memory Plugin](https://github.com/Magi-Labs/memory-plugin) — install the shared memory skill and MCP setup for Codex, Claude Code, Hermes, and other compatible agents.
+
 A self-hosted home for one person's context, across devices and AI agents.
 
 Keep durable facts searchable and carry the current task between clients without rebuilding the conversation from scratch. The repository belongs to Magi Labs; an installation serves a **single personal owner**. It has no organization, team, or billing model.
